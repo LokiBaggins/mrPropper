@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.baggins.controller.DuplicatesController">
+   <children>
+      <TextField fx:id="propsDirectoryPath" layoutX="196.0" layoutY="37.0" prefHeight="25.0" prefWidth="255.0" text="d:\Projects\mrPropper" />
+      <TextField layoutX="173.0" layoutY="86.0" prefHeight="25.0" prefWidth="255.0" />
+      <TextField layoutX="173.0" layoutY="122.0" prefHeight="25.0" prefWidth="255.0" />
+      <Separator layoutX="-2.0" layoutY="70.0" prefHeight="8.0" prefWidth="600.0" />
+      <Button fx:id="btnDirectory" layoutX="462.0" layoutY="37.0" mnemonicParsing="false" onAction="#getDirectoryFiles" text="Button" />
+      <Button layoutX="439.0" layoutY="86.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="439.0" layoutY="122.0" mnemonicParsing="false" text="Button" />
+      <Label layoutX="14.0" layoutY="41.0" prefHeight="17.0" prefWidth="171.0" text="Directory, where the files live" />
+      <Label layoutX="14.0" layoutY="90.0" prefHeight="17.0" prefWidth="142.0" text="Files to be compared" />
+      <Separator layoutY="199.0" prefHeight="17.0" prefWidth="600.0" />
+   </children>
+</AnchorPane>

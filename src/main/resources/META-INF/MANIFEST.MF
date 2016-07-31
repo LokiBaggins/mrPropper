@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Built-By: amiashkou
+Build-Jdk: 1.7.0_80
+Created-By: Apache Maven 3.3.9
+Main-Class: by.baggins.App
+Archiver-Version: Plexus Archiver
