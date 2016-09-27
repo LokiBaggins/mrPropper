@@ -1,13 +1,13 @@
 package by.baggins;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class App extends Application {
 
@@ -24,7 +24,7 @@ public class App extends Application {
             FXMLLoader loader = new FXMLLoader();
             InputStream inputStream = App.class.getResourceAsStream(fxmlFile);
             Parent root = (Parent) loader.load(inputStream);
-            stage.setTitle("JavaFX and Maven");
+            stage.setTitle("mrPropper");
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {

@@ -7,7 +7,8 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.baggins.controller.DuplicatesController">
    <children>
-      <TextField fx:id="propsDirectoryPath" layoutX="196.0" layoutY="37.0" prefHeight="25.0" prefWidth="255.0" text="d:\Projects\mrPropper" />
+      <!--<TextField fx:id="propsDirectoryPath" layoutX="196.0" layoutY="37.0" prefHeight="25.0" prefWidth="255.0" text="d:\Projects\mrPropper" />-->
+      <TextField fx:id="propsDirectoryPath" layoutX="196.0" layoutY="37.0" prefHeight="25.0" prefWidth="255.0" text="e:\JAVA_PROJECTS\mrPropper" />
       <TextField layoutX="173.0" layoutY="86.0" prefHeight="25.0" prefWidth="255.0" />
       <TextField layoutX="173.0" layoutY="122.0" prefHeight="25.0" prefWidth="255.0" />
       <Separator layoutX="-2.0" layoutY="70.0" prefHeight="8.0" prefWidth="600.0" />
