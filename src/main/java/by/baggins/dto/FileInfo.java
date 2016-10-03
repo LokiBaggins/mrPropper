@@ -1,12 +1,14 @@
 package by.baggins.dto;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class FileInfo {
-    private final LongProperty size;
+    private final DoubleProperty size;
     private final StringProperty name;
     private final StringProperty fileType;
 
@@ -14,21 +16,21 @@ public class FileInfo {
         this(null, null, null);
     }
 
-    public FileInfo(Long size, String name, String fileType) {
-        this.size = new SimpleLongProperty(size);
+    public FileInfo(Double size, String name, String fileType) {
+        this.size = new SimpleDoubleProperty(size);
         this.name = new SimpleStringProperty(name);
         this.fileType = new SimpleStringProperty(fileType);
     }
 
-    public Long getSize() {
+    public Double getSize() {
         return size.get();
     }
 
-    public LongProperty sizeProperty() {
+    public DoubleProperty sizeProperty() {
         return size;
     }
 
-    public void setSize(Long size) {
+    public void setSize(Double size) {
         this.size.set(size);
     }
 
@@ -54,5 +56,14 @@ public class FileInfo {
 
     public void setFileType(String fileType) {
         this.fileType.set(fileType);
+    }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "size=" + size +
+                ", name=" + name +
+                ", fileType=" + fileType +
+                '}';
     }
 }

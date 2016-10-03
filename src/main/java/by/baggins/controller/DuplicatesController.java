@@ -30,7 +30,7 @@ public class DuplicatesController {
 //        File[] propsFiles = dir.listFiles(propsFilter);
 
         if (propsFiles == null || propsFiles.length == 0){
-            System.out.println("No files founs in dir '" + dir + "'");
+            System.out.println("No files found in dir '" + dir + "'");
         }
         List<FileInfo> fileInfoList = new ArrayList<FileInfo>();
         for (int i = 0; i < propsFiles.length; i++) {
@@ -43,9 +43,13 @@ public class DuplicatesController {
                 System.out.println("Directory " + propsFiles[i].getName());
             }
 
-            FileInfo fileInfo = new FileInfo(propsFiles[i].length() / 1024, propsFiles[i].getName(), fileType);
+            double fileSize =  ((Long)propsFiles[i].length()).doubleValue() / 1024;
+
+            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize*100)/100.0d, propsFiles[i].getName(), fileType);
             fileInfoList.add(fileInfo);
         }
-        System.out.println(fileInfoList);
+        for (FileInfo fileInfo : fileInfoList) {
+            System.out.println(fileInfo);
+        }
     }
 }
