@@ -18,6 +18,7 @@ import java.util.List;
 public class DuplicatesController {
 
     @FXML private TextField propsDirectoryPath;
+
     @FXML private TableView<FileInfo> fileInfoTable;
     @FXML private TableColumn<FileInfo, String> fileNameColumn;
     @FXML private TableColumn<FileInfo, String> fileTypeColumn;
@@ -34,7 +35,14 @@ public class DuplicatesController {
         fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         fileTypeColumn.setCellValueFactory(cellData -> cellData.getValue().fileTypeProperty());
         fileSizeColumn.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
+
+        showFileDetails(null);
+
+        fileInfoTable.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> showFileDetails(newValue));
     }
+    
+    
 
     public List<FileInfo> getDirectoryFiles() {
         String dirPath = propsDirectoryPath.getText();
