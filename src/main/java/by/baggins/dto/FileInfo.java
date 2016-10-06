@@ -1,25 +1,26 @@
 package by.baggins.dto;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 public class FileInfo {
     private final DoubleProperty size;
     private final StringProperty name;
     private final StringProperty fileType;
+    private final IntegerProperty keySet;
 
     public FileInfo() {
-        this(null, null, null);
+        this(null, null, null, null);
     }
 
     public FileInfo(Double size, String name, String fileType) {
+        this(size, name, fileType, null);
+    }
+
+    public FileInfo(Double size, String name, String fileType, Integer keySet) {
         this.size = new SimpleDoubleProperty(size);
         this.name = new SimpleStringProperty(name);
         this.fileType = new SimpleStringProperty(fileType);
+        this.keySet = new SimpleIntegerProperty(keySet);
     }
 
     public Double getSize() {
@@ -56,6 +57,18 @@ public class FileInfo {
 
     public void setFileType(String fileType) {
         this.fileType.set(fileType);
+    }
+
+    public int getKeySet() {
+        return keySet.get();
+    }
+
+    public IntegerProperty keySetProperty() {
+        return keySet;
+    }
+
+    public void setKeySet(int keySet) {
+        this.keySet.set(keySet);
     }
 
     @Override

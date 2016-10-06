@@ -11,8 +11,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
+import java.util.Properties;
 
 public class DuplicatesController {
 
@@ -75,17 +75,19 @@ public class DuplicatesController {
         ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
         for (File propsFile : propsFiles) {
             String fileType = "";
+            String fileName = propsFile.getName();
             if (propsFile.isFile()) {
                 fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
+                fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                 System.out.println("File " + propsFile.getName());
             } else if (propsFile.isDirectory()) {
                 fileType = "DIR";
-                System.out.println("Directory " + propsFile.getName());
+                System.out.println("Directory " + fileName);
             }
 
             double fileSize = ((Long) propsFile.length()).doubleValue() / 1024;
 
-            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, propsFile.getName(), fileType);
+            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, fileName, fileType, getFileKeySetLength(propsFile));
             fileInfoList.add(fileInfo);
         }
 
@@ -95,6 +97,19 @@ public class DuplicatesController {
 //        }
 
         return fileInfoList;
+    }
+
+    private Integer getFileKeySetLength(File file){
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileInputStream(file));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+//TODO replace logic of keys.length definition. Set trimms duplicates
+        return properties.keySet().size();
     }
 
     public void setApp(App app) {

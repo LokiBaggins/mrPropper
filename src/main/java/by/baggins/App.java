@@ -17,9 +17,9 @@ public class App extends Application {
     private ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
 
     public App() {
-        fileInfoList.add(new FileInfo(2.4d, "file1", "txt"));
-        fileInfoList.add(new FileInfo(2.5d, "file2", "xml"));
-        fileInfoList.add(new FileInfo(2.6d, "file3", "xsl"));
+//        fileInfoList.add(new FileInfo(2.4d, "file1", "txt"));
+//        fileInfoList.add(new FileInfo(2.5d, "file2", "xml"));
+//        fileInfoList.add(new FileInfo(2.6d, "file3", "xsl"));
     }
 
     public static void main(String[] args) throws Exception {
