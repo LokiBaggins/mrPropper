@@ -3,7 +3,8 @@ package by.baggins.controller;
 
 import by.baggins.App;
 import by.baggins.dto.FileInfo;
-import javafx.event.ActionEvent;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -12,8 +13,6 @@ import javafx.scene.control.TextField;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DuplicatesController {
 
@@ -32,6 +31,12 @@ public class DuplicatesController {
 
     @FXML
     private void initialize() {
+//        fileNameColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<FileInfo, String>, ObservableValue<String>>() {
+//            @Override
+//            public ObservableValue<String> call(TableColumn.CellDataFeatures<FileInfo, String> cellData) {
+//                return cellData.getValue().nameProperty();
+//            }
+//        });
         fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         fileTypeColumn.setCellValueFactory(cellData -> cellData.getValue().fileTypeProperty());
         fileSizeColumn.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
@@ -42,9 +47,12 @@ public class DuplicatesController {
                 (observable, oldValue, newValue) -> showFileDetails(newValue));
     }
     
-    
+    public void handleSelectBtn() {
+        fileInfoTable.setItems(getDirectoryFiles());
 
-    public List<FileInfo> getDirectoryFiles() {
+    }
+
+    public ObservableList<FileInfo> getDirectoryFiles() {
         String dirPath = propsDirectoryPath.getText();
         if (dirPath == null || dirPath.equals("")) {
 //            TODO: throw and exception and handle it
@@ -62,8 +70,9 @@ public class DuplicatesController {
 
         if (propsFiles == null || propsFiles.length == 0){
             System.out.println("No files found in dir '" + dir + "'");
+            return null;
         }
-        List<FileInfo> fileInfoList = new ArrayList<FileInfo>();
+        ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
         for (int i = 0; i < propsFiles.length; i++) {
             String fileType = "";
             if (propsFiles[i].isFile()) {
