@@ -59,36 +59,35 @@ public class DuplicatesController {
             return null;
         }
         File dir = new File(dirPath);
-//        FilenameFilter propsFilter = (dir1, name) -> name.toLowerCase().endsWith(".properties");
-        FilenameFilter propsFilter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".properties");
-            }
-        };
-        File[] propsFiles = dir.listFiles();
-//        File[] propsFiles = dir.listFiles(propsFilter);
+        FilenameFilter propsFilter = (dir1, name) -> name.toLowerCase().endsWith(".properties");
+//        FilenameFilter propsFilter = new FilenameFilter() {
+//            public boolean accept(File dir, String name) {
+//                return name.toLowerCase().endsWith(".properties");
+//            }
+//        };
+//        File[] propsFiles = dir.listFiles();
+        File[] propsFiles = dir.listFiles(propsFilter);
 
         if (propsFiles == null || propsFiles.length == 0){
             System.out.println("No files found in dir '" + dir + "'");
             return null;
         }
         ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
-        for (int i = 0; i < propsFiles.length; i++) {
+        for (File propsFile : propsFiles) {
             String fileType = "";
-            if (propsFiles[i].isFile()) {
-                fileType = propsFiles[i].getName().substring(propsFiles[i].getName().indexOf('.') +1);
-                System.out.println("File " + propsFiles[i].getName());
-            } else if (propsFiles[i].isDirectory()) {
+            if (propsFile.isFile()) {
+                fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
+                System.out.println("File " + propsFile.getName());
+            } else if (propsFile.isDirectory()) {
                 fileType = "DIR";
-                System.out.println("Directory " + propsFiles[i].getName());
+                System.out.println("Directory " + propsFile.getName());
             }
 
-            double fileSize =  ((Long)propsFiles[i].length()).doubleValue() / 1024;
+            double fileSize = ((Long) propsFile.length()).doubleValue() / 1024;
 
-            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize*100)/100.0d, propsFiles[i].getName(), fileType);
+            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, propsFile.getName(), fileType);
             fileInfoList.add(fileInfo);
         }
-
 
 //        fileInfoList.forEach(System.out::println);
 //        for (FileInfo fileInfo : fileInfoList) {
