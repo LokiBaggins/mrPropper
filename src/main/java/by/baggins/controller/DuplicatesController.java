@@ -5,10 +5,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import by.baggins.App;
+import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.FileInfo;
+import by.baggins.dto.LocaleName;
+import by.baggins.service.CompareService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -93,10 +98,20 @@ public class DuplicatesController {
             }
 
             double fileSize = ((Long) propsFile.length()).doubleValue() / 1024;
+            Properties fileProps = getFileProperties(propsFile);
 
-            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, fileName, fileType, getFileKeySetLength(propsFile));
+            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, fileName, fileType, fileProps.keySet().size(), fileProps);
             fileInfoList.add(fileInfo);
         }
+
+//            TODO move to separate method
+        Map localeMapping = getLocalePropertyMapping(fileInfoList);
+        ComparisonSummary summary = new CompareService().getPropertiesDifference(localeMapping);
+
+        System.out.println(summary.translateIntoRU);
+        System.out.println(summary.translateIntoKK);
+        System.out.println(summary.translateIntoEN);
+
 
 //        fileInfoList.forEach(System.out::println);
 //        for (FileInfo fileInfo : fileInfoList) {
@@ -106,7 +121,7 @@ public class DuplicatesController {
         return fileInfoList;
     }
 
-    private Integer getFileKeySetLength(File file){
+    private Properties getFileProperties(File file){
         Properties properties = new Properties();
         try {
             properties.load(new FileInputStream(file));
@@ -115,8 +130,7 @@ public class DuplicatesController {
             e.printStackTrace();
             return null;
         }
-//TODO replace logic of keys.length definition. Set trimms duplicates
-        return properties.keySet().size();
+        return properties;
     }
 
     public void setApp(App app) {
@@ -139,6 +153,14 @@ public class DuplicatesController {
         }
     }
 
+    private Map<LocaleName, Properties> getLocalePropertyMapping(ObservableList<FileInfo> fileList){
+        Map<LocaleName, Properties> result = new HashMap<>();
 
+        for (FileInfo fileInfo : fileList) {
+            String fileSuffix = fileInfo.getName().substring(fileInfo.getName().indexOf('_') + 1).toUpperCase();
+            result.put(LocaleName.valueOf(fileSuffix), fileInfo.getProperties());
+        }
+        return result;
+    }
 
 }

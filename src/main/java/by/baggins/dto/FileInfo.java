@@ -1,5 +1,7 @@
 package by.baggins.dto;
 
+import java.util.Properties;
+
 import javafx.beans.property.*;
 
 public class FileInfo {
@@ -7,20 +9,22 @@ public class FileInfo {
     private final StringProperty name;
     private final StringProperty fileType;
     private final IntegerProperty keySetSize;
+    private Properties properties;
 
     public FileInfo() {
-        this(null, null, null, null);
+        this(null, null, null, null, null);
     }
 
     public FileInfo(Double size, String name, String fileType) {
-        this(size, name, fileType, null);
+        this(size, name, fileType, null, null);
     }
 
-    public FileInfo(Double size, String name, String fileType, Integer keySetSize) {
+    public FileInfo(Double size, String name, String fileType, Integer keySetSize, Properties properties) {
         this.size = new SimpleDoubleProperty(size);
         this.name = new SimpleStringProperty(name);
         this.fileType = new SimpleStringProperty(fileType);
         this.keySetSize = new SimpleIntegerProperty(keySetSize);
+        this.properties = properties;
     }
 
     public Double getSize() {
@@ -69,6 +73,14 @@ public class FileInfo {
 
     public void setKeySetSize(int keySetSize) {
         this.keySetSize.set(keySetSize);
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
     }
 
     @Override
