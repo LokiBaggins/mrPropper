@@ -1,6 +1,12 @@
 package by.baggins.controller;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.Properties;
+
 import by.baggins.App;
 import by.baggins.dto.FileInfo;
 import javafx.collections.FXCollections;
@@ -11,9 +17,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
-import java.io.*;
-import java.util.Properties;
-
 public class DuplicatesController {
 
     @FXML private TextField propsDirectoryPath;
@@ -22,10 +25,13 @@ public class DuplicatesController {
     @FXML private TableColumn<FileInfo, String> fileNameColumn;
     @FXML private TableColumn<FileInfo, String> fileTypeColumn;
     @FXML private TableColumn<FileInfo, Double> fileSizeColumn;
+    @FXML private TableColumn<FileInfo, Integer> fileKeySetColumn;
 
+    @FXML private Label fileInfoLabel;
     @FXML private Label fileNameLabel;
     @FXML private Label fileTypeLabel;
     @FXML private Label fileSizeLabel;
+    @FXML private Label fileKeySetLabel;
 
     private App app;
 
@@ -40,6 +46,7 @@ public class DuplicatesController {
         fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         fileTypeColumn.setCellValueFactory(cellData -> cellData.getValue().fileTypeProperty());
         fileSizeColumn.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
+        fileKeySetColumn.setCellValueFactory(cellData -> cellData.getValue().keySetSizeProperty().asObject());
 
         showFileDetails(null);
 
@@ -118,13 +125,17 @@ public class DuplicatesController {
     }
 
     public void showFileDetails(FileInfo fileInfo) {
+        fileInfoLabel.setText("File Info");
         fileNameLabel.setText("---");
         fileTypeLabel.setText("---");
         fileSizeLabel.setText("---");
+        fileKeySetLabel.setText("---");
         if (fileInfo != null) {
+            fileInfoLabel.setText(fileInfo.getName());
             fileNameLabel.setText(fileInfo.getName());
             fileTypeLabel.setText(fileInfo.getFileType());
             fileSizeLabel.setText(fileInfo.getSize().toString());
+            fileKeySetLabel.setText(fileInfo.getKeySetSize().toString());
         }
     }
 

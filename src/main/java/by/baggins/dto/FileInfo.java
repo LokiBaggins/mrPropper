@@ -6,7 +6,7 @@ public class FileInfo {
     private final DoubleProperty size;
     private final StringProperty name;
     private final StringProperty fileType;
-    private final IntegerProperty keySet;
+    private final IntegerProperty keySetSize;
 
     public FileInfo() {
         this(null, null, null, null);
@@ -16,11 +16,11 @@ public class FileInfo {
         this(size, name, fileType, null);
     }
 
-    public FileInfo(Double size, String name, String fileType, Integer keySet) {
+    public FileInfo(Double size, String name, String fileType, Integer keySetSize) {
         this.size = new SimpleDoubleProperty(size);
         this.name = new SimpleStringProperty(name);
         this.fileType = new SimpleStringProperty(fileType);
-        this.keySet = new SimpleIntegerProperty(keySet);
+        this.keySetSize = new SimpleIntegerProperty(keySetSize);
     }
 
     public Double getSize() {
@@ -59,16 +59,16 @@ public class FileInfo {
         this.fileType.set(fileType);
     }
 
-    public int getKeySet() {
-        return keySet.get();
+    public Integer getKeySetSize() {
+        return keySetSize.get();
     }
 
-    public IntegerProperty keySetProperty() {
-        return keySet;
+    public IntegerProperty keySetSizeProperty() {
+        return keySetSize;
     }
 
-    public void setKeySet(int keySet) {
-        this.keySet.set(keySet);
+    public void setKeySetSize(int keySetSize) {
+        this.keySetSize.set(keySetSize);
     }
 
     @Override
