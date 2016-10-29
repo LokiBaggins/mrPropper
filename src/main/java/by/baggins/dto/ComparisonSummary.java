@@ -31,4 +31,47 @@ public class ComparisonSummary {
         this.translateIntoTR = translateIntoTR;
     }
 
+    @Override
+    public String toString() {
+        return "ComparisonSummary{" +
+                "translateIntoDE=" + translateIntoDE.keySet().toString() +
+                ", translateIntoRU=" + translateIntoRU.keySet().toString() +
+                ", translateIntoKK=" + translateIntoKK.keySet().toString() +
+                ", translateIntoEN=" + translateIntoEN.keySet().toString() +
+                ", translateIntoFR=" + translateIntoFR.keySet().toString() +
+                ", translateIntoTR=" + translateIntoTR.keySet().toString() +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ComparisonSummary that = (ComparisonSummary) o;
+
+        if (translateIntoRU != null ? !translateIntoRU.equals(that.translateIntoRU) : that.translateIntoRU != null)
+            return false;
+        if (translateIntoKK != null ? !translateIntoKK.equals(that.translateIntoKK) : that.translateIntoKK != null)
+            return false;
+        if (translateIntoEN != null ? !translateIntoEN.equals(that.translateIntoEN) : that.translateIntoEN != null)
+            return false;
+        if (translateIntoDE != null ? !translateIntoDE.equals(that.translateIntoDE) : that.translateIntoDE != null)
+            return false;
+        if (translateIntoFR != null ? !translateIntoFR.equals(that.translateIntoFR) : that.translateIntoFR != null)
+            return false;
+        return translateIntoTR != null ? translateIntoTR.equals(that.translateIntoTR) : that.translateIntoTR == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = translateIntoRU != null ? translateIntoRU.hashCode() : 0;
+        result = 31 * result + (translateIntoKK != null ? translateIntoKK.hashCode() : 0);
+        result = 31 * result + (translateIntoEN != null ? translateIntoEN.hashCode() : 0);
+        result = 31 * result + (translateIntoDE != null ? translateIntoDE.hashCode() : 0);
+        result = 31 * result + (translateIntoFR != null ? translateIntoFR.hashCode() : 0);
+        result = 31 * result + (translateIntoTR != null ? translateIntoTR.hashCode() : 0);
+        return result;
+    }
 }
