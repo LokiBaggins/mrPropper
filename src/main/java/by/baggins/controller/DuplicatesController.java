@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import by.baggins.App;
 import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.FileInfo;
 import by.baggins.dto.LocaleName;
@@ -38,8 +37,6 @@ public class DuplicatesController {
     @FXML private Label fileSizeLabel;
     @FXML private Label fileKeySetLabel;
 
-    private App app;
-
     @FXML
     private void initialize() {
 //        fileNameColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<FileInfo, String>, ObservableValue<String>>() {
@@ -61,7 +58,6 @@ public class DuplicatesController {
     
     public void handleSelectBtn() {
         fileInfoTable.setItems(getDirectoryFiles());
-
     }
 
     public ObservableList<FileInfo> getDirectoryFiles() {
@@ -89,8 +85,8 @@ public class DuplicatesController {
             String fileType = "";
             String fileName = propsFile.getName();
             if (propsFile.isFile()) {
-                fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
                 fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+                fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
                 System.out.println("File " + propsFile.getName());
             } else if (propsFile.isDirectory()) {
                 fileType = "DIR";
@@ -99,14 +95,15 @@ public class DuplicatesController {
 
             double fileSize = ((Long) propsFile.length()).doubleValue() / 1024;
             Properties fileProps = getFileProperties(propsFile);
+            int propsNumber = (fileProps != null) ? fileProps.keySet().size() : 0;
 
-            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, fileName, fileType, fileProps.keySet().size(), fileProps);
+            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, fileName, fileType, propsNumber, fileProps);
             fileInfoList.add(fileInfo);
         }
 
 //            TODO move to separate method
         Map localeMapping = getLocalePropertyMapping(fileInfoList);
-        ComparisonSummary summary = new CompareService().getPropertiesDifference(localeMapping);
+        ComparisonSummary summary = new CompareService().compareProperties(localeMapping);
 
         System.out.println(summary.translateIntoRU);
         System.out.println(summary.translateIntoKK);
@@ -119,23 +116,6 @@ public class DuplicatesController {
 //        }
 
         return fileInfoList;
-    }
-
-    private Properties getFileProperties(File file){
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(file));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return properties;
-    }
-
-    public void setApp(App app) {
-        this.app = app;
-        fileInfoTable.setItems(app.getFileInfoList());
     }
 
     public void showFileDetails(FileInfo fileInfo) {
@@ -151,6 +131,18 @@ public class DuplicatesController {
             fileSizeLabel.setText(fileInfo.getSize().toString());
             fileKeySetLabel.setText(fileInfo.getKeySetSize().toString());
         }
+    }
+
+    private Properties getFileProperties(File file){
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileInputStream(file));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return properties;
     }
 
     private Map<LocaleName, Properties> getLocalePropertyMapping(ObservableList<FileInfo> fileList){
