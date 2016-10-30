@@ -12,14 +12,13 @@ public class CompareService {
 
     public ComparisonSummary compareProperties(Map<LocaleName, Properties> incomingBundle) {
         ComparisonSummary result = new ComparisonSummary();
-//        cloneBundleToSummary(result, incomingBundle);
 
 //TODO: replace with List<Properties> and find out how to bind it with proper file
         for (LocaleName localeName : incomingBundle.keySet()) {
             System.out.println("Comparing locale " + localeName.toString() + ":");
             Properties props = incomingBundle.get(localeName);
             if (props == null) {
-                System.out.println("No such file in bundle");
+//                System.out.println("No such file in bundle");
                 continue;
             }
 
@@ -30,53 +29,33 @@ public class CompareService {
                 String currValue = (String) currentProp.getValue();
                 
                 for (LocaleName locale : incomingBundle.keySet()) {
-                    System.out.print("\t"+currKey+" vs " + locale +":");
+
+//                    System.out.print("\t"+currKey+" vs " + locale +":");
+
                     if(localeName.equals(locale)){
-//                        props.remove(currKey);
                         iterator.remove();
-                        System.out.println(" removed");
+//                        System.out.println(" removed");
                         continue;
                     }
 
                     Properties toBeTranslated = getStorageByLocaleName(locale, result);
                     if (toBeTranslated == null) {
-                        System.out.println(" skipped");
+//                        System.out.println(" skipped");
                         continue;
                     }
 
-
-                    if (!incomingBundle.get(locale).containsKey(currKey)){
-                        toBeTranslated.setProperty(currKey, currValue);
-                        System.out.println(" added");
-                    } else {
-                        System.out.println(" present. removed from " + locale);
+                    if (incomingBundle.get(locale).containsKey(currKey)) {
+//                        System.out.println(" present. removed from " + locale);
                         incomingBundle.get(locale).remove(currKey);
+                    } else {
+                        toBeTranslated.setProperty(currKey, currValue);
+//                        System.out.println(" added");
                     }
                 }
-//                cloneSummaryToBundle(result, incomingBundle);
             }
         }
 
         return result;
-    }
-
-    private void cloneBundleToSummary(ComparisonSummary result, Map<LocaleName, Properties> incomingBundle) {
-        for (LocaleName localeName : incomingBundle.keySet()) {
-            incomingBundle.put(localeName, (Properties) getStorageByLocaleName(localeName, result).clone());
-        }
-    }
-
-    private void cloneSummaryToBundle(ComparisonSummary result, Map<LocaleName, Properties> incomingBundle) {
-        for (LocaleName localeName : incomingBundle.keySet()) {
-            switch (localeName) {
-                case RU: result.translateIntoRU = (Properties) incomingBundle.get(localeName).clone();
-                case KK: result.translateIntoKK = (Properties) incomingBundle.get(localeName).clone();
-                case EN: result.translateIntoEN = (Properties) incomingBundle.get(localeName).clone();
-                case DE: result.translateIntoDE = (Properties) incomingBundle.get(localeName).clone();
-                case FR: result.translateIntoFR = (Properties) incomingBundle.get(localeName).clone();
-                case TR: result.translateIntoTR = (Properties) incomingBundle.get(localeName).clone();
-            }
-        }
     }
 
     private Properties getStorageByLocaleName(LocaleName localeName, ComparisonSummary containerObject) {
@@ -91,8 +70,4 @@ public class CompareService {
 
         return null;
     }
-
-
-//    TODO test method
-
 }
