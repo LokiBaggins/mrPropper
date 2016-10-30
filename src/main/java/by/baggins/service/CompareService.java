@@ -1,24 +1,21 @@
 package by.baggins.service;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
 import by.baggins.dto.ComparisonSummary;
-import by.baggins.dto.LocaleName;
 
 public class CompareService {
 
+    public ComparisonSummary compareProperties(Map<String, Properties> incomingBundle) {
+//        ComparisonSummary result = new ComparisonSummary();
+        Map<String, Properties> resultMap = new HashMap<>();
 
-    public ComparisonSummary compareProperties(Map<LocaleName, Properties> incomingBundle) {
-        ComparisonSummary result = new ComparisonSummary();
-
-//TODO: replace with List<Properties> and find out how to bind it with proper file
-        for (LocaleName localeName : incomingBundle.keySet()) {
-            System.out.println("Comparing locale " + localeName.toString() + ":");
-            Properties props = incomingBundle.get(localeName);
+        for (String fileName : incomingBundle.keySet()) {
+            Properties props = incomingBundle.get(fileName);
             if (props == null) {
-//                System.out.println("No such file in bundle");
                 continue;
             }
 
@@ -27,47 +24,30 @@ public class CompareService {
                 Map.Entry<Object, Object> currentProp = iterator.next();
                 String currKey = (String) currentProp.getKey();
                 String currValue = (String) currentProp.getValue();
-                
-                for (LocaleName locale : incomingBundle.keySet()) {
 
-//                    System.out.print("\t"+currKey+" vs " + locale +":");
+                for (String comparingFileName : incomingBundle.keySet()) {
 
-                    if(localeName.equals(locale)){
+                    if(fileName.equals(comparingFileName)){
                         iterator.remove();
-//                        System.out.println(" removed");
                         continue;
                     }
 
-                    Properties toBeTranslated = getStorageByLocaleName(locale, result);
+//                    Properties toBeTranslated = result.getToBeTranslated().get(comparingFileName);
+                    Properties toBeTranslated = resultMap.get(comparingFileName);
                     if (toBeTranslated == null) {
-//                        System.out.println(" skipped");
-                        continue;
+                        toBeTranslated = new Properties();
+                        resultMap.put(comparingFileName, toBeTranslated);
                     }
 
-                    if (incomingBundle.get(locale).containsKey(currKey)) {
-//                        System.out.println(" present. removed from " + locale);
-                        incomingBundle.get(locale).remove(currKey);
+                    if (incomingBundle.get(comparingFileName).containsKey(currKey)) {
+                        incomingBundle.get(comparingFileName).remove(currKey);
                     } else {
                         toBeTranslated.setProperty(currKey, currValue);
-//                        System.out.println(" added");
                     }
                 }
             }
         }
 
-        return result;
-    }
-
-    private Properties getStorageByLocaleName(LocaleName localeName, ComparisonSummary containerObject) {
-        switch (localeName) {
-            case RU: return containerObject.translateIntoRU;
-            case KK: return containerObject.translateIntoKK;
-            case EN: return containerObject.translateIntoEN;
-            case DE: return containerObject.translateIntoDE;
-            case FR: return containerObject.translateIntoFR;
-            case TR: return containerObject.translateIntoTR;
-        }
-
-        return null;
+        return new ComparisonSummary(resultMap);
     }
 }

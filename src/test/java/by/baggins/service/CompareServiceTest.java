@@ -7,24 +7,23 @@ import java.util.Map;
 import java.util.Properties;
 
 import by.baggins.dto.ComparisonSummary;
-import by.baggins.dto.LocaleName;
 
 import static org.junit.Assert.assertEquals;
 
 public class CompareServiceTest {
-    
 
     @Test
     public void testCompareProperties() throws Exception {
-        Map<LocaleName, Properties> incomingBundle = getMockPropertiesMap();
+        Map<String, Properties> incomingBundle = getMockPropertiesMap();
         ComparisonSummary ethalon = getMockSummary();
 
         ComparisonSummary actual = new CompareService().compareProperties(incomingBundle);
         System.out.println(actual);
         assertEquals(ethalon, actual);
+
     }
     
-    private Map<LocaleName, Properties> getMockPropertiesMap(){
+    private Map<String, Properties> getMockPropertiesMap(){
         Properties ru = new Properties();
         ru.setProperty("p1", "1");
         ru.setProperty("p2", "2");
@@ -41,29 +40,33 @@ public class CompareServiceTest {
         kk.setProperty("p3", "3");
         kk.setProperty("p5", "5");
 
-        Map<LocaleName,Properties> result = new HashMap<>();
-        result.put(LocaleName.RU, ru);
-        result.put(LocaleName.EN, en);
-        result.put(LocaleName.KK, kk);
+        Map<String,Properties> result = new HashMap<>();
+        result.put("file1", ru);
+        result.put("file2", en);
+        result.put("file3", kk);
 
         return result;
     }
 
     private ComparisonSummary getMockSummary(){
-        ComparisonSummary result = new ComparisonSummary();
+        Map<String, Properties> resultMap = new HashMap<>();
 
-        Properties ru = result.translateIntoRU;
+        Properties ru = new Properties();
         ru.setProperty("p4", "4");
         ru.setProperty("p5", "5");
 
-        Properties en = result.translateIntoEN;
+        Properties en = new Properties();
         en.setProperty("p3", "3");
         en.setProperty("p5", "5");
 
-        Properties kk = result.translateIntoKK;
+        Properties kk = new Properties();
         kk.setProperty("p4", "4");
 
-        return result;
+        resultMap.put("file1",  ru);
+        resultMap.put("file2",  en);
+        resultMap.put("file3",  kk);
+
+        return new ComparisonSummary(resultMap);
     }
 
 }

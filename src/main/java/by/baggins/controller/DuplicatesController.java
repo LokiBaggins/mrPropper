@@ -102,19 +102,11 @@ public class DuplicatesController {
         }
 
 //            TODO move to separate method
-        Map localeMapping = getLocalePropertyMapping(fileInfoList);
+//        Map localeMapping = getLocalePropertyMapping(fileInfoList);
+        Map<String, Properties> localeMapping = getFilePropertiesMapping(fileInfoList);
         ComparisonSummary summary = new CompareService().compareProperties(localeMapping);
 
-        System.out.println(summary.translateIntoRU);
-        System.out.println(summary.translateIntoKK);
-        System.out.println(summary.translateIntoEN);
-
-
-//        fileInfoList.forEach(System.out::println);
-//        for (FileInfo fileInfo : fileInfoList) {
-//            System.out.println(fileInfo);
-//        }
-
+        System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
         return fileInfoList;
     }
 
@@ -151,6 +143,15 @@ public class DuplicatesController {
         for (FileInfo fileInfo : fileList) {
             String fileSuffix = fileInfo.getName().substring(fileInfo.getName().indexOf('_') + 1).toUpperCase();
             result.put(LocaleName.valueOf(fileSuffix), fileInfo.getProperties());
+        }
+        return result;
+    }
+
+    private Map<String, Properties> getFilePropertiesMapping(ObservableList<FileInfo> fileList){
+        Map<String, Properties> result = new HashMap<>();
+
+        for (FileInfo fileInfo : fileList) {
+            result.put(fileInfo.getName(), fileInfo.getProperties());
         }
         return result;
     }
