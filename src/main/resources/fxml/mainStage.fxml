@@ -1,53 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="606.0" prefWidth="801.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="by.baggins.controller.DuplicatesController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="768.0" prefWidth="1024.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="by.baggins.controller.DuplicatesController">
   <children>
-    <!--<TextField fx:id="propsDirectoryPath" layoutX="196.0" layoutY="37.0" prefHeight="25.0" prefWidth="255.0" text="d:\Projects\smartbank-utils\src\props\updater\new\web-client\" />-->
     <TextField fx:id="propsDirectoryPath" layoutX="196.0" layoutY="37.0" prefHeight="25.0" prefWidth="255.0" text="../messages" />
     <Separator layoutX="4.0" layoutY="145.0" prefHeight="17.0" prefWidth="640.0" />
     <Button fx:id="btnDirectory" layoutX="462.0" layoutY="37.0" mnemonicParsing="false" onAction="#handleSelectBtn" text="Button" />
     <Label layoutX="14.0" layoutY="41.0" prefHeight="17.0" prefWidth="171.0" text="Directory, where the files live" />
-    <SplitPane dividerPositions="0.4230287859824781" layoutY="152.0" prefHeight="455.0" prefWidth="801.0">
+    <SplitPane dividerPositions="0.36666666666666664" layoutX="0.0" layoutY="152.0" prefHeight="455.0" prefWidth="932.0">
       <items>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="453.0" prefWidth="360.0" />
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="453.0" prefWidth="590.0">
           <children>
-            <Label fx:id="fileInfoLabel" layoutX="14.0" layoutY="14.0" prefHeight="24.0" prefWidth="363.0" text="File info">
+            <Label layoutX="14.0" layoutY="134.0" prefHeight="24.0" prefWidth="363.0" text="В данный файл нужно добавить переводы:">
               <font>
-                <Font name="System Bold" size="18.0" />
+                <Font name="System Bold" size="14.0" />
               </font>
             </Label>
-            <GridPane layoutX="12.0" layoutY="54.0" prefHeight="139.0" prefWidth="432.0">
+            <GridPane layoutX="12.0" layoutY="44.0" prefHeight="41.0" prefWidth="431.9999000000025">
               <children>
-                <Label prefHeight="19.0" prefWidth="111.0" text="File name">
-                  <font>
-                    <Font size="13.0" />
-                  </font>
-                </Label>
-                <Label text="File type" GridPane.rowIndex="1" />
-                <Label text="File size (KB)" GridPane.rowIndex="2" />
-                <Label text="Keys in file" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                <Label fx:id="fileNameLabel" text="Label" GridPane.columnIndex="1" />
-                <Label fx:id="fileTypeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <Label fx:id="fileSizeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <Label fx:id="fileKeySetLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <Label text="File size (KB)" GridPane.rowIndex="0" />
+                <Label text="Keys in file" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Label fx:id="fileSizeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label fx:id="fileKeySetLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
               </children>
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="215.0" minWidth="10.0" prefWidth="120.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="312.0" minWidth="10.0" prefWidth="312.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="56.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="90.0" minHeight="10.0" prefHeight="21.0" vgrow="SOMETIMES" />
               </rowConstraints>
             </GridPane>
+            <Label fx:id="fileNameLabel" layoutX="12.0" layoutY="14.0" prefHeight="24.0" prefWidth="363.0" text="File name">
+              <font>
+                <Font name="System Bold" size="18.0" />
+              </font>
+            </Label>
+            <TableView layoutX="14.0" layoutY="158.0" prefHeight="200.0" prefWidth="559.0">
+              <columns>
+                <TableColumn id="poprKey" maxWidth="5000.0" minWidth="10.0" prefWidth="200.0" text="Key" />
+                <TableColumn id="propValue" maxWidth="5000.0" minWidth="10.0" prefWidth="355.0" text="Translation" />
+              </columns>
+            </TableView>
           </children>
         </AnchorPane>
       </items>
@@ -61,7 +60,7 @@
         <TableColumn prefWidth="166.0" text="File Name" fx:id="fileNameColumn" />
         <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="87.0" text="Type" fx:id="fileTypeColumn" />
         <TableColumn minWidth="0.0" prefWidth="105.0" text="Size" fx:id="fileSizeColumn" />
-        <TableColumn minWidth="0.0" prefWidth="105.0" text="Keys" fx:id="fileKeySetColumn" />
+        <TableColumn minWidth="0.0" prefWidth="105.0" text="Total keys" fx:id="fileKeySetColumn" />
       </columns>
     </TableView>
   </children>

@@ -31,11 +31,11 @@ public class DuplicatesController {
     @FXML private TableColumn<FileInfo, Double> fileSizeColumn;
     @FXML private TableColumn<FileInfo, Integer> fileKeySetColumn;
 
-    @FXML private Label fileInfoLabel;
+//    @FXML private Label fileInfoLabel;
     @FXML private Label fileNameLabel;
-    @FXML private Label fileTypeLabel;
     @FXML private Label fileSizeLabel;
     @FXML private Label fileKeySetLabel;
+
 
     @FXML
     private void initialize() {
@@ -111,19 +111,17 @@ public class DuplicatesController {
     }
 
     public void showFileDetails(FileInfo fileInfo) {
-        fileInfoLabel.setText("File Info");
         fileNameLabel.setText("---");
-        fileTypeLabel.setText("---");
         fileSizeLabel.setText("---");
         fileKeySetLabel.setText("---");
         if (fileInfo != null) {
-            fileInfoLabel.setText(fileInfo.getName());
             fileNameLabel.setText(fileInfo.getName());
-            fileTypeLabel.setText(fileInfo.getFileType());
             fileSizeLabel.setText(fileInfo.getSize().toString());
             fileKeySetLabel.setText(fileInfo.getKeySetSize().toString());
         }
     }
+
+
 
     private Properties getFileProperties(File file){
         Properties properties = new Properties();
