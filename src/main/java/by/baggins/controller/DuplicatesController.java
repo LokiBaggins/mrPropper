@@ -11,7 +11,6 @@ import java.util.Properties;
 
 import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.FileInfo;
-import by.baggins.dto.LocaleName;
 import by.baggins.service.CompareService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 public class DuplicatesController {
@@ -31,11 +31,16 @@ public class DuplicatesController {
     @FXML private TableColumn<FileInfo, Double> fileSizeColumn;
     @FXML private TableColumn<FileInfo, Integer> fileKeySetColumn;
 
-//    @FXML private Label fileInfoLabel;
     @FXML private Label fileNameLabel;
     @FXML private Label fileSizeLabel;
     @FXML private Label fileKeySetLabel;
 
+//    @FXML private TableView<Map.Entry<String, String>> resultsTable;
+//    @FXML private TableColumn<Map.Entry<String, String>, String> resultsRowNumberColumn;
+//    @FXML private TableColumn<Map.Entry<String, String>, String> resultsKeyColumn;
+//    @FXML private TableColumn<Map.Entry<String, String>, String> resultsValueColumn;
+
+    @FXML private TextArea resultsArea;
 
     @FXML
     private void initialize() {
@@ -57,7 +62,16 @@ public class DuplicatesController {
     }
     
     public void handleSelectBtn() {
-        fileInfoTable.setItems(getDirectoryFiles());
+        ObservableList<FileInfo> fileInfoList = getDirectoryFiles();
+        fileInfoTable.setItems(fileInfoList);
+
+//        Map localeMapping = getLocalePropertyMapping(fileInfoList);
+        Map<String, Properties> localeMapping = getFilePropertiesMapping(fileInfoList);
+        ComparisonSummary summary = new CompareService().compareProperties(localeMapping);
+
+        System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
+
+
     }
 
     public ObservableList<FileInfo> getDirectoryFiles() {
@@ -101,16 +115,14 @@ public class DuplicatesController {
             fileInfoList.add(fileInfo);
         }
 
-//            TODO move to separate method
-//        Map localeMapping = getLocalePropertyMapping(fileInfoList);
-        Map<String, Properties> localeMapping = getFilePropertiesMapping(fileInfoList);
-        ComparisonSummary summary = new CompareService().compareProperties(localeMapping);
-
-        System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
         return fileInfoList;
     }
 
     public void showFileDetails(FileInfo fileInfo) {
+        showFileDetails(fileInfo, null);
+    }
+
+    public void showFileDetails(FileInfo fileInfo, Properties props) {
         fileNameLabel.setText("---");
         fileSizeLabel.setText("---");
         fileKeySetLabel.setText("---");
@@ -119,6 +131,9 @@ public class DuplicatesController {
             fileSizeLabel.setText(fileInfo.getSize().toString());
             fileKeySetLabel.setText(fileInfo.getKeySetSize().toString());
         }
+
+
+
     }
 
 
@@ -133,16 +148,6 @@ public class DuplicatesController {
             return null;
         }
         return properties;
-    }
-
-    private Map<LocaleName, Properties> getLocalePropertyMapping(ObservableList<FileInfo> fileList){
-        Map<LocaleName, Properties> result = new HashMap<>();
-
-        for (FileInfo fileInfo : fileList) {
-            String fileSuffix = fileInfo.getName().substring(fileInfo.getName().indexOf('_') + 1).toUpperCase();
-            result.put(LocaleName.valueOf(fileSuffix), fileInfo.getProperties());
-        }
-        return result;
     }
 
     private Map<String, Properties> getFilePropertiesMapping(ObservableList<FileInfo> fileList){
