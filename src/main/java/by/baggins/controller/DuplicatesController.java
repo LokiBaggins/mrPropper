@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.FileInfo;
@@ -50,6 +51,7 @@ public class DuplicatesController {
 //                return cellData.getValue().nameProperty();
 //            }
 //        });
+
         fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         fileTypeColumn.setCellValueFactory(cellData -> cellData.getValue().fileTypeProperty());
         fileSizeColumn.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
@@ -68,6 +70,15 @@ public class DuplicatesController {
 //        Map localeMapping = getLocalePropertyMapping(fileInfoList);
         Map<String, Properties> localeMapping = getFilePropertiesMapping(fileInfoList);
         ComparisonSummary summary = new CompareService().compareProperties(localeMapping);
+
+        resultsArea.clear();
+        for (String fileName : summary.getToBeTranslated().keySet()) {
+            Set<Map.Entry<Object, Object>> props = summary.getToBeTranslated().get(fileName).entrySet();
+            resultsArea.appendText("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
+            for (Map.Entry<Object, Object> prop : props) {
+                resultsArea.appendText(prop.getKey() + "=" + prop.getValue() + "\n\t");
+            }
+        }
 
         System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
 
@@ -131,9 +142,6 @@ public class DuplicatesController {
             fileSizeLabel.setText(fileInfo.getSize().toString());
             fileKeySetLabel.setText(fileInfo.getKeySetSize().toString());
         }
-
-
-
     }
 
 
