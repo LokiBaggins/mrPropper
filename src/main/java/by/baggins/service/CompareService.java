@@ -1,5 +1,6 @@
 package by.baggins.service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -10,7 +11,8 @@ import by.baggins.dto.ComparisonSummary;
 public class CompareService {
 
     public ComparisonSummary compareProperties(Map<String, Properties> incomingBundle) {
-//        ComparisonSummary result = new ComparisonSummary();
+        Long startTime = new Date().getTime();
+
         Map<String, Properties> resultMap = new HashMap<>();
 
         for (String fileName : incomingBundle.keySet()) {
@@ -32,7 +34,8 @@ public class CompareService {
                         continue;
                     }
 
-//                    Properties toBeTranslated = result.getToBeTranslated().get(comparingFileName);
+//                    TODO: refactor with
+                    /* Escaping NullPointerException: initialize result Properties for each file while the first call */
                     Properties toBeTranslated = resultMap.get(comparingFileName);
                     if (toBeTranslated == null) {
                         toBeTranslated = new Properties();
@@ -47,6 +50,10 @@ public class CompareService {
                 }
             }
         }
+
+
+//      Горизонтальная логика сравнения свойств отработала на боевом бандле: "Elapsed time: 16"
+        System.out.println("Elapsed time: " + (new Date().getTime() - startTime));
 
         return new ComparisonSummary(resultMap);
     }

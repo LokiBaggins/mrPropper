@@ -25,20 +25,20 @@ public class CompareServiceTest {
     
     private Map<String, Properties> getMockPropertiesMap(){
         Properties ru = new Properties();
-        ru.setProperty("p1", "1");
-        ru.setProperty("p2", "2");
-        ru.setProperty("p3", "3");
+        ru.setProperty("p1", "один");
+        ru.setProperty("p2", "два");
+        ru.setProperty("p3", "три");
 
         Properties en = new Properties();
-        en.setProperty("p1", "1");
-        en.setProperty("p2", "2");
-        en.setProperty("p4", "4");
+        en.setProperty("p1", "one");
+        en.setProperty("p2", "two");
+        en.setProperty("p4", "four");
 
         Properties kk = new Properties();
-        kk.setProperty("p1", "1");
-        kk.setProperty("p2", "2");
-        kk.setProperty("p3", "3");
-        kk.setProperty("p5", "5");
+        kk.setProperty("p1", "а");
+        kk.setProperty("p2", "екі");
+        kk.setProperty("p3", "үш");
+        kk.setProperty("p5", "бес");
 
         Map<String,Properties> result = new HashMap<>();
         result.put("file1", ru);
@@ -52,15 +52,15 @@ public class CompareServiceTest {
         Map<String, Properties> resultMap = new HashMap<>();
 
         Properties ru = new Properties();
-        ru.setProperty("p4", "4");
-        ru.setProperty("p5", "5");
+        ru.setProperty("p4", "four");
+        ru.setProperty("p5", "бес");
 
         Properties en = new Properties();
-        en.setProperty("p3", "3");
-        en.setProperty("p5", "5");
+        en.setProperty("p3", "үш");
+        en.setProperty("p5", "бес");
 
         Properties kk = new Properties();
-        kk.setProperty("p4", "4");
+        kk.setProperty("p4", "four");
 
         resultMap.put("file1",  ru);
         resultMap.put("file2",  en);

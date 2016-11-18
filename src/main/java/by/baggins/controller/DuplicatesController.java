@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -51,6 +52,7 @@ public class DuplicatesController {
 //                return cellData.getValue().nameProperty();
 //            }
 //        });
+        resultsArea.setWrapText(false);
 
         fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         fileTypeColumn.setCellValueFactory(cellData -> cellData.getValue().fileTypeProperty());
@@ -64,7 +66,7 @@ public class DuplicatesController {
     }
     
     public void handleSelectBtn() {
-        ObservableList<FileInfo> fileInfoList = getDirectoryFiles();
+        ObservableList<FileInfo> fileInfoList = analyzeDirectoryFiles();
         fileInfoTable.setItems(fileInfoList);
 
 //        Map localeMapping = getLocalePropertyMapping(fileInfoList);
@@ -72,20 +74,26 @@ public class DuplicatesController {
         ComparisonSummary summary = new CompareService().compareProperties(localeMapping);
 
         resultsArea.clear();
+        StringBuilder resultsText = new StringBuilder();
         for (String fileName : summary.getToBeTranslated().keySet()) {
             Set<Map.Entry<Object, Object>> props = summary.getToBeTranslated().get(fileName).entrySet();
-            resultsArea.appendText("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
+            resultsText.append("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
             for (Map.Entry<Object, Object> prop : props) {
-                resultsArea.appendText(prop.getKey() + "=" + prop.getValue() + "\n\t");
+                resultsText.append(prop.getKey() + "=" + prop.getValue() + "\n\t");
             }
+//            resultsArea.appendText("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
+//            for (Map.Entry<Object, Object> prop : props) {
+//                resultsArea.appendText(prop.getKey() + "=" + prop.getValue() + "\n\t");
+//            }
         }
+        resultsArea.setText(resultsText.toString());
 
         System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
 
 
     }
 
-    public ObservableList<FileInfo> getDirectoryFiles() {
+    private ObservableList<FileInfo> analyzeDirectoryFiles() {
         String dirPath = propsDirectoryPath.getText();
         if (dirPath == null || dirPath.equals("")) {
 //            TODO: throw and exception and handle it
@@ -119,7 +127,8 @@ public class DuplicatesController {
             }
 
             double fileSize = ((Long) propsFile.length()).doubleValue() / 1024;
-            Properties fileProps = getFileProperties(propsFile);
+//            Properties fileProps = getFileProperties(propsFile);
+            Properties fileProps = getFilePropertiesUTF8(propsFile);
             int propsNumber = (fileProps != null) ? fileProps.keySet().size() : 0;
 
             FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, fileName, fileType, propsNumber, fileProps);
@@ -129,11 +138,22 @@ public class DuplicatesController {
         return fileInfoList;
     }
 
-    public void showFileDetails(FileInfo fileInfo) {
+    private Properties getFilePropertiesUTF8(File file) {
+        Properties properties = new Properties();
+        try {
+            properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return properties;
+    }
+
+    private void showFileDetails(FileInfo fileInfo) {
         showFileDetails(fileInfo, null);
     }
 
-    public void showFileDetails(FileInfo fileInfo, Properties props) {
+    private void showFileDetails(FileInfo fileInfo, Properties props) {
         fileNameLabel.setText("---");
         fileSizeLabel.setText("---");
         fileKeySetLabel.setText("---");
@@ -146,17 +166,17 @@ public class DuplicatesController {
 
 
 
-    private Properties getFileProperties(File file){
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(file));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return properties;
-    }
+//    private Properties getFileProperties(File file){
+//        Properties properties = new Properties();
+//        try {
+//            properties.load(new FileInputStream(file));
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//        return properties;
+//    }
 
     private Map<String, Properties> getFilePropertiesMapping(ObservableList<FileInfo> fileList){
         Map<String, Properties> result = new HashMap<>();
