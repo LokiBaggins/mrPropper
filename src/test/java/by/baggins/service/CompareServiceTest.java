@@ -16,8 +16,8 @@ public class CompareServiceTest {
     public void testCompareProperties() throws Exception {
         Map<String, Properties> incomingBundle = getMockPropertiesMap();
         ComparisonSummary ethalon = getMockSummary();
-
         ComparisonSummary actual = new CompareService().compareProperties(incomingBundle);
+
         System.out.println(actual);
         assertEquals(ethalon, actual);
 
