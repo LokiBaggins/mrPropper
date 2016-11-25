@@ -10,13 +10,13 @@ import by.baggins.dto.ComparisonSummary;
 
 import static org.junit.Assert.assertEquals;
 
-public class CompareServiceTest {
+public class CompareServiceImplTest {
 
     @Test
     public void testCompareProperties() throws Exception {
         Map<String, Properties> incomingBundle = getMockPropertiesMap();
         ComparisonSummary ethalon = getMockSummary();
-        ComparisonSummary actual = new CompareService().compareProperties(incomingBundle);
+        ComparisonSummary actual = new CompareServiceImpl().compareProperties(incomingBundle);
 
         System.out.println(actual);
         assertEquals(ethalon, actual);
