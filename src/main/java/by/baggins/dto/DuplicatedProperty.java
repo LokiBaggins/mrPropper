@@ -3,13 +3,13 @@ package by.baggins.dto;
 
 import java.util.List;
 
-public class PropertySet {
+public class DuplicatedProperty {
     private String code;
-    private List<PropertyValue> values;
+    private List<DuplicatedPropertyValue> values;
 
-    public PropertySet() {}
+    public DuplicatedProperty() { }
 
-    public PropertySet(String code, List<PropertyValue> values) {
+    public DuplicatedProperty(String code, List<DuplicatedPropertyValue> values) {
         this.code = code;
         this.values = values;
     }
@@ -22,11 +22,11 @@ public class PropertySet {
         this.code = code;
     }
 
-    public List<PropertyValue> getValues() {
+    public List<DuplicatedPropertyValue> getValues() {
         return values;
     }
 
-    public void setValues(List<PropertyValue> values) {
+    public void setValues(List<DuplicatedPropertyValue> values) {
         this.values = values;
     }
 

@@ -1,13 +1,13 @@
 package by.baggins.dto;
 
-public class PropertyValue {
+public class DuplicatedPropertyValue {
     private int rowNum;
     private String text;
 
-    public PropertyValue() {
+    public DuplicatedPropertyValue() {
     }
 
-    public PropertyValue(int rowNum, String text) {
+    public DuplicatedPropertyValue(int rowNum, String text) {
         this.rowNum = rowNum;
         this.text = text;
     }
