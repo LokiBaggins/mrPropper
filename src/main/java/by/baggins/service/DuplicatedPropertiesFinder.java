@@ -19,33 +19,6 @@ import by.baggins.dto.DuplicatesSearchResult;
  */
 public class DuplicatedPropertiesFinder {
 
-
-//    TODO: move to controller method
-//    public static void main(String[] args) {
-//        String locale = "de";
-//        String propertiesFile = "D:\\Projects\\smartbank\\web-client\\src\\main\\resources\\messages\\messages_"+locale+".properties";
-//
-//        List<DuplicatedProperty> keyDuplicates = new ArrayList<>();
-//        List<DuplicatedProperty> fullDuplicates = new ArrayList<>();
-//
-//        try {
-//
-////            TODO: replace wtih List<DuplicatedProperty>
-//            Map<String, List<DuplicatedPropertyValue>> propertiesMap = parseFileForDuplicates(propertiesFile);
-////            TODO: join propertiesMap+keyDuplicates+fullDuplicates into new DTO
-//            sortDuplicatesByType(propertiesMap, keyDuplicates, fullDuplicates);
-//
-//            System.out.println("Full duplicates found: " + fullDuplicates.size());
-//            System.out.println("Code duplicates found: " + keyDuplicates.size());
-//
-//            printPropertySet(keyDuplicates, "CODE");
-//            printPropertySet(fullDuplicates, "FULL");
-//
-//        } catch (RuntimeException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public DuplicatesSearchResult checkFileForDuplicates(File file) {
         Map<String, List<DuplicatedPropertyValue>> unsortedDuplicates = parseFileForDuplicates(file);
 
@@ -57,10 +30,6 @@ public class DuplicatedPropertiesFinder {
      * @throws FileNotFoundException
      * @throws RuntimeException
      * */
-    private static Map<String, List<DuplicatedPropertyValue>> parseFileForDuplicates(String filePath){
-        return parseFileForDuplicates(new File(filePath));
-    }
-
     private static Map<String, List<DuplicatedPropertyValue>> parseFileForDuplicates(File file){
         Map<String, List<DuplicatedPropertyValue>> result = new HashMap<>();
         int rowNum = 1;
@@ -132,39 +101,4 @@ public class DuplicatedPropertiesFinder {
         return result;
     }
 
-    public void printPropertySet (List<DuplicatedProperty> duplicatedProperty, String duplicatesType) {
-        if (duplicatedProperty.isEmpty()) {
-            return;
-        }
-        if (duplicatesType.equals("FULL")){
-            printFullDuplicatesSet(duplicatedProperty);
-            return;
-        }
-
-        printCodeDuplicatesSet(duplicatedProperty);
-    }
-
-    private void printCodeDuplicatesSet(List<DuplicatedProperty> duplicatedProperties) {
-        System.out.println("\n\n CODE duplicates list:");
-        for (int i = 0; i < duplicatedProperties.size(); i++) {
-            DuplicatedProperty duplicatedProperty = duplicatedProperties.get(i);
-            System.out.print(i + ". " + duplicatedProperty.getCode() + "\n");
-            for (DuplicatedPropertyValue duplicatedPropertyValue : duplicatedProperty.getValues()) {
-                System.out.println("\t  " + duplicatedPropertyValue);
-            }
-        }
-    }
-
-    private void printFullDuplicatesSet(List<DuplicatedProperty> duplicatedProperties) {
-        System.out.println("\n\n FULL duplicates list:");
-        for (int i = 0; i < duplicatedProperties.size(); i++) {
-            DuplicatedProperty duplicatedProperty = duplicatedProperties.get(i);
-            StringBuilder msg = new StringBuilder((i+1) + ". " + duplicatedProperty.getCode() + "   Used in rows: ");
-
-            for (DuplicatedPropertyValue duplicatedPropertyValue : duplicatedProperty.getValues()) {
-                msg.append(duplicatedPropertyValue.getRowNum()).append("; ");
-            }
-            System.out.println(msg.toString());
-        }
-    }
 }

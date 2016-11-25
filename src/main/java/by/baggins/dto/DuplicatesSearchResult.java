@@ -32,4 +32,12 @@ public class DuplicatesSearchResult {
     public void setFullDuplicates(List<DuplicatedProperty> fullDuplicates) {
         this.fullDuplicates = fullDuplicates;
     }
+
+    @Override
+    public String toString() {
+        return "DuplicatesSearchResult{" +
+                "keyDuplicates=" + keyDuplicates +
+                ", fullDuplicates=" + fullDuplicates +
+                '}';
+    }
 }

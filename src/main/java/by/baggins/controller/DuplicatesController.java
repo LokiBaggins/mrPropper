@@ -7,11 +7,14 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import by.baggins.dto.ComparisonSummary;
+import by.baggins.dto.DuplicatedProperty;
+import by.baggins.dto.DuplicatedPropertyValue;
 import by.baggins.dto.FileInfo;
 import by.baggins.service.CompareService;
 import javafx.collections.FXCollections;
@@ -36,11 +39,6 @@ public class DuplicatesController {
     @FXML private Label fileNameLabel;
     @FXML private Label fileSizeLabel;
     @FXML private Label fileKeySetLabel;
-
-//    @FXML private TableView<Map.Entry<String, String>> resultsTable;
-//    @FXML private TableColumn<Map.Entry<String, String>, String> resultsRowNumberColumn;
-//    @FXML private TableColumn<Map.Entry<String, String>, String> resultsKeyColumn;
-//    @FXML private TableColumn<Map.Entry<String, String>, String> resultsValueColumn;
 
     @FXML private TextArea resultsArea;
 
@@ -164,20 +162,6 @@ public class DuplicatesController {
         }
     }
 
-
-
-//    private Properties getFileProperties(File file){
-//        Properties properties = new Properties();
-//        try {
-//            properties.load(new FileInputStream(file));
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//        return properties;
-//    }
-
     private Map<String, Properties> getFilePropertiesMapping(ObservableList<FileInfo> fileList){
         Map<String, Properties> result = new HashMap<>();
 
@@ -185,6 +169,30 @@ public class DuplicatesController {
             result.put(fileInfo.getName(), fileInfo.getProperties());
         }
         return result;
+    }
+
+    private void printCodeDuplicatesSet(List<DuplicatedProperty> duplicatedProperties) {
+        System.out.println("\n\n CODE duplicates list:");
+        for (int i = 0; i < duplicatedProperties.size(); i++) {
+            DuplicatedProperty duplicatedProperty = duplicatedProperties.get(i);
+            System.out.print(i + ". " + duplicatedProperty.getCode() + "\n");
+            for (DuplicatedPropertyValue duplicatedPropertyValue : duplicatedProperty.getValues()) {
+                System.out.println("\t  " + duplicatedPropertyValue);
+            }
+        }
+    }
+
+    private void printFullDuplicatesSet(List<DuplicatedProperty> duplicatedProperties) {
+        System.out.println("\n\n FULL duplicates list:");
+        for (int i = 0; i < duplicatedProperties.size(); i++) {
+            DuplicatedProperty duplicatedProperty = duplicatedProperties.get(i);
+            StringBuilder msg = new StringBuilder((i+1) + ". " + duplicatedProperty.getCode() + "   Used in rows: ");
+
+            for (DuplicatedPropertyValue duplicatedPropertyValue : duplicatedProperty.getValues()) {
+                msg.append(duplicatedPropertyValue.getRowNum()).append("; ");
+            }
+            System.out.println(msg.toString());
+        }
     }
 
 }

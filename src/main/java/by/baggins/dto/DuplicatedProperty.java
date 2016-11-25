@@ -30,4 +30,11 @@ public class DuplicatedProperty {
         this.values = values;
     }
 
+    @Override
+    public String toString() {
+        return "DuplicatedProperty{" +
+                "code='" + code + '\'' +
+                ", values=" + values +
+                '}';
+    }
 }

@@ -15,8 +15,7 @@ public class DuplicatePropsFinderTest {
     public void testDuplicatesSearchResult() {
         DuplicatesSearchResult duplicates = duplicator.checkFileForDuplicates(new File(filePath));
 
-        duplicator.printPropertySet(duplicates.getKeyDuplicates(), "CODE");
-        duplicator.printPropertySet(duplicates.getFullDuplicates(), "FULL");
+        System.out.println(duplicates);
     }
 
 }
