@@ -5,50 +5,37 @@ import java.util.Properties;
 import javafx.beans.property.*;
 
 public class FileInfo {
-    private final DoubleProperty size;
-    private final StringProperty name;
+    private final StringProperty fileName;
     private final StringProperty fileType;
-    private final IntegerProperty keySetSize;
+    private final IntegerProperty propertiesNumber;
+
     private Properties properties;
+    private DuplicatesSearchResult duplicates;
 
-    public FileInfo() {
-        this(null, null, null, null, null);
-    }
-
-    public FileInfo(Double size, String name, String fileType) {
-        this(size, name, fileType, null, null);
-    }
-
-    public FileInfo(Double size, String name, String fileType, Integer keySetSize, Properties properties) {
-        this.size = new SimpleDoubleProperty(size);
-        this.name = new SimpleStringProperty(name);
+    public FileInfo(String name, String fileType, Properties properties) {
+        this.fileName = new SimpleStringProperty(name);
         this.fileType = new SimpleStringProperty(fileType);
-        this.keySetSize = new SimpleIntegerProperty(keySetSize);
+        this.propertiesNumber = new SimpleIntegerProperty(properties.keySet().size());
         this.properties = properties;
+        this.duplicates = new DuplicatesSearchResult();
     }
 
-    public Double getSize() {
-        return size.get();
+    public FileInfo(String name, String fileType, Properties properties, DuplicatesSearchResult duplicates) {
+        this(name, fileType, properties);
+        this.duplicates = duplicates;
     }
 
-    public DoubleProperty sizeProperty() {
-        return size;
+
+    public String getFileName() {
+        return fileName.get();
     }
 
-    public void setSize(Double size) {
-        this.size.set(size);
+    public StringProperty fileNameProperty() {
+        return fileName;
     }
 
-    public String getName() {
-        return name.get();
-    }
-
-    public StringProperty nameProperty() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name.set(name);
+    public void setFileName(String fileName) {
+        this.fileName.set(fileName);
     }
 
     public String getFileType() {
@@ -63,16 +50,16 @@ public class FileInfo {
         this.fileType.set(fileType);
     }
 
-    public Integer getKeySetSize() {
-        return keySetSize.get();
+    public int getPropertiesNumber() {
+        return propertiesNumber.get();
     }
 
-    public IntegerProperty keySetSizeProperty() {
-        return keySetSize;
+    public IntegerProperty propertiesNumberProperty() {
+        return propertiesNumber;
     }
 
-    public void setKeySetSize(int keySetSize) {
-        this.keySetSize.set(keySetSize);
+    public void setPropertiesNumber(int propertiesNumber) {
+        this.propertiesNumber.set(propertiesNumber);
     }
 
     public Properties getProperties() {
@@ -83,12 +70,22 @@ public class FileInfo {
         this.properties = properties;
     }
 
+    public DuplicatesSearchResult getDuplicates() {
+        return duplicates;
+    }
+
+    public void setDuplicates(DuplicatesSearchResult duplicates) {
+        this.duplicates = duplicates;
+    }
+
     @Override
     public String toString() {
         return "FileInfo{" +
-                "size=" + size +
-                ", name=" + name +
+                "fileName=" + fileName +
                 ", fileType=" + fileType +
+                ", propertiesNumber=" + propertiesNumber +
+                ", properties=" + properties +
+                ", duplicates=" + duplicates +
                 '}';
     }
 }

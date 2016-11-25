@@ -17,6 +17,7 @@ import by.baggins.dto.DuplicatedProperty;
 import by.baggins.dto.DuplicatedPropertyValue;
 import by.baggins.dto.FileInfo;
 import by.baggins.service.CompareService;
+import by.baggins.service.CompareServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -47,15 +48,14 @@ public class DuplicatesController {
 //        fileNameColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<FileInfo, String>, ObservableValue<String>>() {
 //            @Override
 //            public ObservableValue<String> call(TableColumn.CellDataFeatures<FileInfo, String> cellData) {
-//                return cellData.getValue().nameProperty();
+//                return cellData.getValue().fileNameProperty();
 //            }
 //        });
         resultsArea.setWrapText(false);
 
-        fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
         fileTypeColumn.setCellValueFactory(cellData -> cellData.getValue().fileTypeProperty());
-        fileSizeColumn.setCellValueFactory(cellData -> cellData.getValue().sizeProperty().asObject());
-        fileKeySetColumn.setCellValueFactory(cellData -> cellData.getValue().keySetSizeProperty().asObject());
+        fileKeySetColumn.setCellValueFactory(cellData -> cellData.getValue().propertiesNumberProperty().asObject());
 
         showFileDetails(null);
 
@@ -67,9 +67,9 @@ public class DuplicatesController {
         ObservableList<FileInfo> fileInfoList = analyzeDirectoryFiles();
         fileInfoTable.setItems(fileInfoList);
 
-//        Map localeMapping = getLocalePropertyMapping(fileInfoList);
         Map<String, Properties> localeMapping = getFilePropertiesMapping(fileInfoList);
-        ComparisonSummary summary = new CompareService().compareProperties(localeMapping);
+        CompareService comparator = new CompareServiceImpl();
+        ComparisonSummary summary = comparator.compareProperties(localeMapping);
 
         resultsArea.clear();
         StringBuilder resultsText = new StringBuilder();
@@ -79,10 +79,6 @@ public class DuplicatesController {
             for (Map.Entry<Object, Object> prop : props) {
                 resultsText.append(prop.getKey() + "=" + prop.getValue() + "\n\t");
             }
-//            resultsArea.appendText("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
-//            for (Map.Entry<Object, Object> prop : props) {
-//                resultsArea.appendText(prop.getKey() + "=" + prop.getValue() + "\n\t");
-//            }
         }
         resultsArea.setText(resultsText.toString());
 
@@ -93,18 +89,21 @@ public class DuplicatesController {
 
     private ObservableList<FileInfo> analyzeDirectoryFiles() {
         String dirPath = propsDirectoryPath.getText();
+        ObservableList<FileInfo> result = getGeneralFilesInfo(dirPath);
+
+
+        return null;
+    }
+
+
+    private ObservableList<FileInfo> getGeneralFilesInfo(String dirPath) {
         if (dirPath == null || dirPath.equals("")) {
 //            TODO: throw and exception and handle it
             return null;
         }
+
         File dir = new File(dirPath);
         FilenameFilter propsFilter = (dir1, name) -> name.toLowerCase().endsWith(".properties");
-//        FilenameFilter propsFilter = new FilenameFilter() {
-//            public boolean accept(File dir, String name) {
-//                return name.toLowerCase().endsWith(".properties");
-//            }
-//        };
-//        File[] propsFiles = dir.listFiles();
         File[] propsFiles = dir.listFiles(propsFilter);
 
         if (propsFiles == null || propsFiles.length == 0){
@@ -129,11 +128,12 @@ public class DuplicatesController {
             Properties fileProps = getFilePropertiesUTF8(propsFile);
             int propsNumber = (fileProps != null) ? fileProps.keySet().size() : 0;
 
-            FileInfo fileInfo = new FileInfo((double) Math.round(fileSize * 100) / 100.0d, fileName, fileType, propsNumber, fileProps);
+            FileInfo fileInfo = new FileInfo(fileName, fileType, fileProps);
             fileInfoList.add(fileInfo);
         }
 
         return fileInfoList;
+
     }
 
     private Properties getFilePropertiesUTF8(File file) {
@@ -153,12 +153,10 @@ public class DuplicatesController {
 
     private void showFileDetails(FileInfo fileInfo, Properties props) {
         fileNameLabel.setText("---");
-        fileSizeLabel.setText("---");
         fileKeySetLabel.setText("---");
         if (fileInfo != null) {
-            fileNameLabel.setText(fileInfo.getName());
-            fileSizeLabel.setText(fileInfo.getSize().toString());
-            fileKeySetLabel.setText(fileInfo.getKeySetSize().toString());
+            fileNameLabel.setText(fileInfo.getFileName());
+            fileKeySetLabel.setText(String.valueOf(fileInfo.getPropertiesNumber()));
         }
     }
 
@@ -166,7 +164,7 @@ public class DuplicatesController {
         Map<String, Properties> result = new HashMap<>();
 
         for (FileInfo fileInfo : fileList) {
-            result.put(fileInfo.getName(), fileInfo.getProperties());
+            result.put(fileInfo.getFileName(), fileInfo.getProperties());
         }
         return result;
     }
