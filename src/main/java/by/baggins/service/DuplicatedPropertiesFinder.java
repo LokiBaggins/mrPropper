@@ -132,7 +132,7 @@ public class DuplicatedPropertiesFinder {
         return result;
     }
 
-    private void printPropertySet (List<DuplicatedProperty> duplicatedProperty, String duplicatesType) {
+    public void printPropertySet (List<DuplicatedProperty> duplicatedProperty, String duplicatesType) {
         if (duplicatedProperty.isEmpty()) {
             return;
         }
