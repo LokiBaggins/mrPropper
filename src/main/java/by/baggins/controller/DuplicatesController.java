@@ -15,9 +15,12 @@ import java.util.Set;
 import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.DuplicatedProperty;
 import by.baggins.dto.DuplicatedPropertyValue;
+import by.baggins.dto.DuplicatesSearchResult;
 import by.baggins.dto.FileInfo;
 import by.baggins.service.CompareService;
 import by.baggins.service.CompareServiceImpl;
+import by.baggins.service.DuplicatedPropertiesFinder;
+import by.baggins.service.DuplicatedPropertiesFinderImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -42,6 +45,8 @@ public class DuplicatesController {
     @FXML private Label fileKeySetLabel;
 
     @FXML private TextArea resultsArea;
+
+    private DuplicatedPropertiesFinder duplicatesFinder = new DuplicatedPropertiesFinderImpl();
 
     @FXML
     private void initialize() {
@@ -89,16 +94,10 @@ public class DuplicatesController {
 
     private ObservableList<FileInfo> analyzeDirectoryFiles() {
         String dirPath = propsDirectoryPath.getText();
-        ObservableList<FileInfo> result = getGeneralFilesInfo(dirPath);
 
-
-        return null;
-    }
-
-
-    private ObservableList<FileInfo> getGeneralFilesInfo(String dirPath) {
         if (dirPath == null || dirPath.equals("")) {
-//            TODO: throw and exception and handle it
+//            TODO: throw user-readable exception and handle it
+            System.out.println("Empty directory path");
             return null;
         }
 
@@ -107,28 +106,37 @@ public class DuplicatesController {
         File[] propsFiles = dir.listFiles(propsFilter);
 
         if (propsFiles == null || propsFiles.length == 0){
+//            TODO: throw user-readable exception and handle it
             System.out.println("No files found in dir '" + dir + "'");
             return null;
         }
+
         ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
         for (File propsFile : propsFiles) {
             String fileType = "";
             String fileName = propsFile.getName();
+
             if (propsFile.isFile()) {
                 fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                 fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
+//                TODO: remove sout
                 System.out.println("File " + propsFile.getName());
             } else if (propsFile.isDirectory()) {
                 fileType = "DIR";
+//                TODO: remove sout
                 System.out.println("Directory " + fileName);
             }
 
-            double fileSize = ((Long) propsFile.length()).doubleValue() / 1024;
-//            Properties fileProps = getFileProperties(propsFile);
             Properties fileProps = getFilePropertiesUTF8(propsFile);
-            int propsNumber = (fileProps != null) ? fileProps.keySet().size() : 0;
+            if (fileProps == null) {
+                fileProps = new Properties();
+            }
 
-            FileInfo fileInfo = new FileInfo(fileName, fileType, fileProps);
+            DuplicatesSearchResult duplicates = duplicatesFinder.checkFileForDuplicates(propsFile);
+//                TODO: remove sout
+            System.out.println("\tduplicates: " + duplicates);
+
+            FileInfo fileInfo = new FileInfo(fileName, fileType, fileProps, duplicates);
             fileInfoList.add(fileInfo);
         }
 
@@ -173,7 +181,7 @@ public class DuplicatesController {
         System.out.println("\n\n CODE duplicates list:");
         for (int i = 0; i < duplicatedProperties.size(); i++) {
             DuplicatedProperty duplicatedProperty = duplicatedProperties.get(i);
-            System.out.print(i + ". " + duplicatedProperty.getCode() + "\n");
+            System.out.print(i + ". " + duplicatedProperty.getMsgKey() + "\n");
             for (DuplicatedPropertyValue duplicatedPropertyValue : duplicatedProperty.getValues()) {
                 System.out.println("\t  " + duplicatedPropertyValue);
             }
@@ -184,7 +192,7 @@ public class DuplicatesController {
         System.out.println("\n\n FULL duplicates list:");
         for (int i = 0; i < duplicatedProperties.size(); i++) {
             DuplicatedProperty duplicatedProperty = duplicatedProperties.get(i);
-            StringBuilder msg = new StringBuilder((i+1) + ". " + duplicatedProperty.getCode() + "   Used in rows: ");
+            StringBuilder msg = new StringBuilder((i+1) + ". " + duplicatedProperty.getMsgKey() + "   Used in rows: ");
 
             for (DuplicatedPropertyValue duplicatedPropertyValue : duplicatedProperty.getValues()) {
                 msg.append(duplicatedPropertyValue.getRowNum()).append("; ");

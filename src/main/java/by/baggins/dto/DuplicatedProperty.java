@@ -4,22 +4,22 @@ package by.baggins.dto;
 import java.util.List;
 
 public class DuplicatedProperty {
-    private String code;
+    private String msgKey;
     private List<DuplicatedPropertyValue> values;
 
     public DuplicatedProperty() { }
 
-    public DuplicatedProperty(String code, List<DuplicatedPropertyValue> values) {
-        this.code = code;
+    public DuplicatedProperty(String msgKey, List<DuplicatedPropertyValue> values) {
+        this.msgKey = msgKey;
         this.values = values;
     }
 
-    public String getCode() {
-        return code;
+    public String getMsgKey() {
+        return msgKey;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setMsgKey(String msgKey) {
+        this.msgKey = msgKey;
     }
 
     public List<DuplicatedPropertyValue> getValues() {
@@ -33,7 +33,7 @@ public class DuplicatedProperty {
     @Override
     public String toString() {
         return "DuplicatedProperty{" +
-                "code='" + code + '\'' +
+                "msgKey='" + msgKey + '\'' +
                 ", values=" + values +
                 '}';
     }
