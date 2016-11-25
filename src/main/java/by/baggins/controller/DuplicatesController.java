@@ -37,12 +37,12 @@ public class DuplicatesController {
     @FXML private TableView<FileInfo> fileInfoTable;
     @FXML private TableColumn<FileInfo, String> fileNameColumn;
     @FXML private TableColumn<FileInfo, String> fileTypeColumn;
-    @FXML private TableColumn<FileInfo, Double> fileSizeColumn;
-    @FXML private TableColumn<FileInfo, Integer> fileKeySetColumn;
+    @FXML private TableColumn<FileInfo, Integer> propertiesNumberColumn;
+    @FXML private TableColumn<FileInfo, Integer> duplicatesNumberColumn;
 
     @FXML private Label fileNameLabel;
-    @FXML private Label fileSizeLabel;
-    @FXML private Label fileKeySetLabel;
+    @FXML private Label duplicatesNumberLabel;
+    @FXML private Label propertiesNumberLabel;
 
     @FXML private TextArea resultsArea;
 
@@ -60,7 +60,8 @@ public class DuplicatesController {
 
         fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
         fileTypeColumn.setCellValueFactory(cellData -> cellData.getValue().fileTypeProperty());
-        fileKeySetColumn.setCellValueFactory(cellData -> cellData.getValue().propertiesNumberProperty().asObject());
+        propertiesNumberColumn.setCellValueFactory(cellData -> cellData.getValue().propertiesNumberProperty().asObject());
+        duplicatesNumberColumn.setCellValueFactory(cellData -> cellData.getValue().duplicatesNumberProperty().asObject());
 
         showFileDetails(null);
 
@@ -161,10 +162,12 @@ public class DuplicatesController {
 
     private void showFileDetails(FileInfo fileInfo, Properties props) {
         fileNameLabel.setText("---");
-        fileKeySetLabel.setText("---");
+        propertiesNumberLabel.setText("---");
+        duplicatesNumberLabel.setText("---");
         if (fileInfo != null) {
             fileNameLabel.setText(fileInfo.getFileName());
-            fileKeySetLabel.setText(String.valueOf(fileInfo.getPropertiesNumber()));
+            propertiesNumberLabel.setText(String.valueOf(fileInfo.getPropertiesNumber()));
+            duplicatesNumberLabel.setText(String.valueOf(fileInfo.getDuplicatesNumber()));
         }
     }
 

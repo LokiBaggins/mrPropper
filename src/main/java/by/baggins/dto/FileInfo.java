@@ -8,21 +8,18 @@ public class FileInfo {
     private final StringProperty fileName;
     private final StringProperty fileType;
     private final IntegerProperty propertiesNumber;
+    private final IntegerProperty duplicatesNumber;
 
     private Properties properties;
     private DuplicatesSearchResult duplicates;
 
-    public FileInfo(String name, String fileType, Properties properties) {
+    public FileInfo(String name, String fileType, Properties properties, DuplicatesSearchResult duplicates) {
         this.fileName = new SimpleStringProperty(name);
         this.fileType = new SimpleStringProperty(fileType);
         this.propertiesNumber = new SimpleIntegerProperty(properties.keySet().size());
         this.properties = properties;
-        this.duplicates = new DuplicatesSearchResult();
-    }
-
-    public FileInfo(String name, String fileType, Properties properties, DuplicatesSearchResult duplicates) {
-        this(name, fileType, properties);
         this.duplicates = duplicates;
+        this.duplicatesNumber = new SimpleIntegerProperty(duplicates.getKeyDuplicates().size() + duplicates.getFullDuplicates().size());
     }
 
 
@@ -76,6 +73,18 @@ public class FileInfo {
 
     public void setDuplicates(DuplicatesSearchResult duplicates) {
         this.duplicates = duplicates;
+    }
+
+    public int getDuplicatesNumber() {
+        return duplicatesNumber.get();
+    }
+
+    public IntegerProperty duplicatesNumberProperty() {
+        return duplicatesNumber;
+    }
+
+    public void setDuplicatesNumber(int duplicatesNumber) {
+        this.duplicatesNumber.set(duplicatesNumber);
     }
 
     @Override
