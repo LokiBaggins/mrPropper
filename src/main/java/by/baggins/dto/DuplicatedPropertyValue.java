@@ -30,6 +30,6 @@ public class DuplicatedPropertyValue {
 
     @Override
     public String toString() {
-        return rowNum + ":  " + text;
+        return  "'" + text + "', row in file: " + rowNum + ";";
     }
 }

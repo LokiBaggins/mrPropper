@@ -32,30 +32,31 @@ import javafx.scene.control.TextField;
 
 public class DuplicatesController {
 
+//    Directory picker block
     @FXML private TextField propsDirectoryPath;
 
+//    Directory info pane
     @FXML private TableView<FileInfo> fileInfoTable;
     @FXML private TableColumn<FileInfo, String> fileNameColumn;
     @FXML private TableColumn<FileInfo, String> fileTypeColumn;
     @FXML private TableColumn<FileInfo, Integer> propertiesNumberColumn;
     @FXML private TableColumn<FileInfo, Integer> duplicatesNumberColumn;
 
+//    File details pane
     @FXML private Label fileNameLabel;
-    @FXML private Label duplicatesNumberLabel;
     @FXML private Label propertiesNumberLabel;
+    @FXML private Label duplicatesNumberLabel;
+    @FXML private Label keyDuplicatesLabel;
+    @FXML private Label fullDuplicatesLabel;
+    @FXML private TextArea fileDuplicatesArea;
 
+//    Bundle comparison result block
     @FXML private TextArea resultsArea;
 
     private DuplicatedPropertiesFinder duplicatesFinder = new DuplicatedPropertiesFinderImpl();
 
     @FXML
     private void initialize() {
-//        fileNameColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<FileInfo, String>, ObservableValue<String>>() {
-//            @Override
-//            public ObservableValue<String> call(TableColumn.CellDataFeatures<FileInfo, String> cellData) {
-//                return cellData.getValue().fileNameProperty();
-//            }
-//        });
         resultsArea.setWrapText(false);
 
         fileNameColumn.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
@@ -120,11 +121,11 @@ public class DuplicatesController {
             if (propsFile.isFile()) {
                 fileName = fileName.substring(0, fileName.lastIndexOf('.'));
                 fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
-//                TODO: remove sout
+//                TODO: replace with logger
                 System.out.println("File " + propsFile.getName());
             } else if (propsFile.isDirectory()) {
                 fileType = "DIR";
-//                TODO: remove sout
+//                TODO: replace with logger
                 System.out.println("Directory " + fileName);
             }
 
@@ -134,7 +135,7 @@ public class DuplicatesController {
             }
 
             DuplicatesSearchResult duplicates = duplicatesFinder.checkFileForDuplicates(propsFile);
-//                TODO: remove sout
+//                TODO: replace with logger
             System.out.println("\tduplicates: " + duplicates);
 
             FileInfo fileInfo = new FileInfo(fileName, fileType, fileProps, duplicates);
@@ -156,18 +157,26 @@ public class DuplicatesController {
         return properties;
     }
 
-    private void showFileDetails(FileInfo fileInfo) {
-        showFileDetails(fileInfo, null);
-    }
 
-    private void showFileDetails(FileInfo fileInfo, Properties props) {
-        fileNameLabel.setText("---");
+    private void showFileDetails(FileInfo fileInfo) {
+        fileNameLabel.setText("Choose a file for detail info");
         propertiesNumberLabel.setText("---");
         duplicatesNumberLabel.setText("---");
+        keyDuplicatesLabel.setText("---");
+        fullDuplicatesLabel.setText("---");
+        fileDuplicatesArea.setText("Nothing to show");
+
         if (fileInfo != null) {
             fileNameLabel.setText(fileInfo.getFileName());
             propertiesNumberLabel.setText(String.valueOf(fileInfo.getPropertiesNumber()));
             duplicatesNumberLabel.setText(String.valueOf(fileInfo.getDuplicatesNumber()));
+
+            DuplicatesSearchResult fileDuplicates = fileInfo.getDuplicates();
+            if (fileDuplicates != null && fileDuplicates.getFullDuplicates() != null && fileDuplicates.getKeyDuplicates() != null) {
+                keyDuplicatesLabel.setText(String.valueOf(fileDuplicates.getKeyDuplicates().size()));
+                fullDuplicatesLabel.setText(String.valueOf(fileDuplicates.getFullDuplicates().size()));
+                fileDuplicatesArea.setText(prettyPrintFileDuplicates(fileDuplicates));
+            }
         }
     }
 
@@ -180,28 +189,37 @@ public class DuplicatesController {
         return result;
     }
 
-    private void printCodeDuplicatesSet(List<DuplicatedProperty> duplicatedProperties) {
-        System.out.println("\n\n CODE duplicates list:");
-        for (int i = 0; i < duplicatedProperties.size(); i++) {
-            DuplicatedProperty duplicatedProperty = duplicatedProperties.get(i);
-            System.out.print(i + ". " + duplicatedProperty.getMsgKey() + "\n");
-            for (DuplicatedPropertyValue duplicatedPropertyValue : duplicatedProperty.getValues()) {
-                System.out.println("\t  " + duplicatedPropertyValue);
-            }
-        }
+    private String prettyPrintFileDuplicates(DuplicatesSearchResult fileDuplicates) {
+        String newLine = System.getProperty("line.separator");
+
+        StringBuilder resultBuilder = new StringBuilder();
+        resultBuilder.append("KEY duplicates list: ").append(printDuplicatesList(fileDuplicates.getKeyDuplicates()));
+        resultBuilder.append(newLine).append("----------------------------------------").append(newLine);
+        resultBuilder.append("FULL duplicates list: ").append(printDuplicatesList(fileDuplicates.getFullDuplicates()));
+
+        return resultBuilder.toString();
     }
 
-    private void printFullDuplicatesSet(List<DuplicatedProperty> duplicatedProperties) {
-        System.out.println("\n\n FULL duplicates list:");
-        for (int i = 0; i < duplicatedProperties.size(); i++) {
-            DuplicatedProperty duplicatedProperty = duplicatedProperties.get(i);
-            StringBuilder msg = new StringBuilder((i+1) + ". " + duplicatedProperty.getMsgKey() + "   Used in rows: ");
+    private String printDuplicatesList(List<DuplicatedProperty> duplicatedProperties) {
+        if (duplicatedProperties.isEmpty()) {
+            return "empty.";
+        }
+
+        StringBuilder resultBuilder = new StringBuilder();
+        String newLine = System.getProperty("line.separator");
+        int keyCounter = 1;
+
+        for (DuplicatedProperty duplicatedProperty : duplicatedProperties) {
+            resultBuilder.append(newLine).append(keyCounter++).append(". ").append(duplicatedProperty.getMsgKey()).append(newLine); // e.g. "\n1. some.key"
 
             for (DuplicatedPropertyValue duplicatedPropertyValue : duplicatedProperty.getValues()) {
-                msg.append(duplicatedPropertyValue.getRowNum()).append("; ");
+                resultBuilder.append("\t").append(duplicatedPropertyValue).append(newLine); //e.g. "\t someValue1"
             }
-            System.out.println(msg.toString());
+
+            resultBuilder.append(newLine);
         }
+
+        return resultBuilder.toString();
     }
 
 }
