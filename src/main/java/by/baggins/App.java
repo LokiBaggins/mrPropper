@@ -27,7 +27,7 @@ public class App extends Application {
         try {
             System.out.println(stage);
 
-            String fxmlFile = "/fxml/mainStage.fxml";
+            String fxmlFile = "/fxml/mrPropperStage.fxml";
             FXMLLoader loader = new FXMLLoader();
             InputStream inputStream = App.class.getResourceAsStream(fxmlFile);
             Parent root = (Parent) loader.load(inputStream);
