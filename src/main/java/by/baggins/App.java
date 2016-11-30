@@ -3,7 +3,7 @@ package by.baggins;
 import java.io.IOException;
 import java.io.InputStream;
 
-import by.baggins.controller.DuplicatesController;
+import by.baggins.controller.MainController;
 import by.baggins.dto.FileInfo;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -30,9 +30,9 @@ public class App extends Application {
             String fxmlFile = "/fxml/mrPropperStage.fxml";
             FXMLLoader loader = new FXMLLoader();
             InputStream inputStream = App.class.getResourceAsStream(fxmlFile);
-            Parent root = (Parent) loader.load(inputStream);
+            Parent root = loader.load(inputStream);
 
-            DuplicatesController dupController = loader.getController();
+            MainController dupController = loader.getController();
 
             stage.setTitle("mrPropper");
             stage.setScene(new Scene(root));
