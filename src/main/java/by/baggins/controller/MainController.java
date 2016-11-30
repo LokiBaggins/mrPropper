@@ -157,7 +157,6 @@ public class MainController {
         return properties;
     }
 
-
     private void showFileDetails(FileInfo fileInfo) {
         fileNameLabel.setText("Choose a file for detail info");
         propertiesNumberLabel.setText("---");

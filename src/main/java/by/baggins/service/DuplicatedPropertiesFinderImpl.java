@@ -28,19 +28,19 @@ public class DuplicatedPropertiesFinderImpl implements DuplicatedPropertiesFinde
 
     /**
      * Parses incoming .properties file line-by-line to find key duplicates.
-     * @throws FileNotFoundException
      * @throws RuntimeException
      * */
     private static Map<String, List<DuplicatedPropertyValue>> parseFileForDuplicates(File file){
         Map<String, List<DuplicatedPropertyValue>> result = new HashMap<>();
+        Scanner scanner = null;
         int rowNum = 1;
         String prop = "";
 
         try {
-            Scanner sc = new Scanner(new FileInputStream(file), "UTF-8");
+            scanner = new Scanner(new FileInputStream(file), "UTF-8");
             String pCode = "";
-            while(sc.hasNext()) {
-                prop = sc.nextLine();
+            while(scanner.hasNext()) {
+                prop = scanner.nextLine();
 
                 if ((prop.indexOf('=') != -1) && (prop.indexOf('#') == -1)) {
                     pCode = prop.substring(0, prop.indexOf('='));
@@ -59,13 +59,13 @@ public class DuplicatedPropertiesFinderImpl implements DuplicatedPropertiesFinde
             }
 
             return result;
-        } catch (FileNotFoundException e) {
-//            TODO: replace with some user exception
-            e.printStackTrace();
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Error! Last parsed row "+ rowNum + ": " + prop);
+        } catch (FileNotFoundException | RuntimeException e) {
+            throw new RuntimeException("Error! Last parsed row "+ rowNum + ": " + prop, e);
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
         }
-        return null;
     }
 
     /**
