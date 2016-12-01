@@ -137,15 +137,20 @@ public class ApplicationController {
 
     }
 
-    private Properties getFilePropertiesUTF8(File file) {
+    private static Properties getFilePropertiesUTF8(File file) {
         Properties properties = new Properties();
-        try {
-            properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+
+        try (FileInputStream inputStream = new FileInputStream(file);
+             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+        ) {
+            properties.load(inputStreamReader);
+            return properties;
+
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
-        return properties;
+
+        return null;
     }
 
     private void showFileDetails(FileInfo fileInfo) {
