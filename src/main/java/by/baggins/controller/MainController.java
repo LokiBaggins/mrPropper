@@ -223,6 +223,8 @@ public class MainController {
                 resultsText.append(prop.getKey() + "=" + prop.getValue() + "\n\t");
             }
         }
+
+        return resultsText.toString();
     }
 
 }
