@@ -79,18 +79,9 @@ public class DuplicatesController {
         ComparisonSummary summary = comparator.compareProperties(localeMapping);
 
         resultsArea.clear();
-        StringBuilder resultsText = new StringBuilder();
-        for (String fileName : summary.getToBeTranslated().keySet()) {
-            Set<Map.Entry<Object, Object>> props = summary.getToBeTranslated().get(fileName).entrySet();
-            resultsText.append("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
-            for (Map.Entry<Object, Object> prop : props) {
-                resultsText.append(prop.getKey() + "=" + prop.getValue() + "\n\t");
-            }
-        }
-        resultsArea.setText(resultsText.toString());
+        resultsArea.setText(printComparisonSummary(summary));
 
         System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
-
 
     }
 
@@ -220,6 +211,19 @@ public class DuplicatesController {
         }
 
         return resultBuilder.toString();
+    }
+
+    private String printComparisonSummary(ComparisonSummary summary) {
+        StringBuilder resultsText = new StringBuilder();
+
+        for (String fileName : summary.getToBeTranslated().keySet()) {
+            Set<Map.Entry<Object, Object>> props = summary.getToBeTranslated().get(fileName).entrySet();
+            resultsText.append("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
+
+            for (Map.Entry<Object, Object> prop : props) {
+                resultsText.append(prop.getKey() + "=" + prop.getValue() + "\n\t");
+            }
+        }
     }
 
 }
