@@ -3,7 +3,6 @@ package by.baggins.controller;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,20 +10,25 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import by.baggins.FileMocker;
 import by.baggins.MocksDuplicatesSerachResults;
 import by.baggins.dto.DuplicatesSearchResult;
+import by.baggins.dto.FileGroup;
 import by.baggins.dto.FileInfo;
+import by.baggins.dto.FolderAnalysisResult;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import static org.junit.Assert.*;
 
 public class ApplicationControllerTest {
+    private static String validFilesNamePattern = "validFile";
+    private static String duplicatedFilesNamePattern = "duplicates_file";
     private static File mockFolder = new File("src\\test\\resources\\mockFolder");
     private static FileMocker fileMocker = new FileMocker(mockFolder.getPath() + "\\");
     private static File validFile1;
@@ -33,7 +37,9 @@ public class ApplicationControllerTest {
     private static File fileWithDuplicatesMixed;
     private static File fileWithDuplicatesKeyOnly;
     private static File fileWithDuplicatesFullOnly;
-    private static ObservableList<FileInfo> expectedFileInfoList;
+//    private static ObservableList<FileInfo> expectedFileInfoList;
+    private static FolderAnalysisResult expectedAnalysisResult;
+    private static FolderAnalysisResult actualResult;
 
     @BeforeClass
     public static void createMockFolder() {
@@ -55,26 +61,33 @@ public class ApplicationControllerTest {
         fileWithDuplicatesFullOnly = fileMocker.createFileWithDuplicatesKeyOnly("duplicates_file_zz.properties");
         fileMocker.createNotPropertiesFiles("someTextFile.txt", "someFile.pdf", "someExeFile.exe"); // here you are welcome to set any filenames with extensions different of ".properties". Any of such files must be ignored by application
 
-        expectedFileInfoList = getExcpectedAnalysisResult();
+        expectedAnalysisResult = getExpectedAnalysisResult();
+        actualResult = new ApplicationController().analyzeDirectoryFiles(mockFolder.getPath());
     }
 
     @Test
     public void testAnalyzeDirectoryFiles_filteringFilesByExtension() {
-        ObservableList<FileInfo> actualFileInfoList = new ApplicationController().analyzeDirectoryFiles(mockFolder.getPath());
-        assertEquals(expectedFileInfoList.size(), actualFileInfoList.size());
+        assertEquals(expectedAnalysisResult.getFolderPath(), actualResult.getFolderPath());
 
-
-        List<String> actualFileTypes = actualFileInfoList.stream().map(FileInfo::getFileType).collect(Collectors.toList());
-        for (String fileType : actualFileTypes) {
-            assertEquals("properties", fileType);
+//        List<String> actualFileTypes = actualResult.getFileGroups().stream().map(FileGroup::getFiles).map(FileInfo::getFileType).collect(Collectors.toList());
+//        TODO: replace with lambda
+        for (FileGroup group : actualResult.getFileGroups()) {
+            for (FileInfo file : group.getFiles()) {
+                assertEquals("properties", file.getFileType());
+            }
         }
     }
 
-    @Ignore("No even idea of how this grouping must be implemented, so how to test it")
     @Test
     public void testAnalyzeDirectoryFiles_groupingFilesByNamePattern() {
+        assertEquals(expectedAnalysisResult.getFileGroups().size(), actualResult.getFileGroups().size());
 
-        fail("Not implemented.");
+        for (FileGroup group : actualResult.getFileGroups()) {
+            String groupFileNamePattern = "^" + group.getName() + "_[a-zA-Z]{2}$";
+            for (FileInfo file : group.getFiles()) {
+                assertTrue(file.getFileName().matches(groupFileNamePattern));
+            }
+        }
     }
 
     @AfterClass
@@ -86,7 +99,7 @@ public class ApplicationControllerTest {
         }
     }
 
-    private static ObservableList<FileInfo> getExcpectedAnalysisResult() {
+    private static FolderAnalysisResult getExpectedAnalysisResult() {
         FileInfo validFile1Info = getFileInfo(validFile1);
         FileInfo validFile2Info = getFileInfo(validFile2);
         FileInfo validFile3Info = getFileInfo(validFile3);
@@ -98,9 +111,20 @@ public class ApplicationControllerTest {
         FileInfo fileWithDuplicatesKeyOnlyFileInfo = getFileInfo(fileWithDuplicatesKeyOnly, duplicatesKeyOnly);
         FileInfo fileWithDuplicatesFullOnlyFileInfo = getFileInfo(fileWithDuplicatesFullOnly, duplicatesFullOnly);
 
-        ObservableList<FileInfo> result = FXCollections.observableArrayList();
-        result.addAll(validFile1Info, validFile2Info, validFile3Info, fileWithDuplicatesMixedFileInfo, fileWithDuplicatesKeyOnlyFileInfo, fileWithDuplicatesFullOnlyFileInfo);
+        ObservableList<FileInfo> group1files = FXCollections.observableArrayList();
+        group1files.addAll(validFile1Info, validFile2Info, validFile3Info);
+        FileGroup group1 = new FileGroup(validFilesNamePattern, group1files);
 
+        ObservableList<FileInfo> group2files = FXCollections.observableArrayList();
+        group2files.addAll(fileWithDuplicatesMixedFileInfo, fileWithDuplicatesKeyOnlyFileInfo, fileWithDuplicatesFullOnlyFileInfo);
+        FileGroup group2 = new FileGroup(duplicatedFilesNamePattern, group2files);
+
+        ObservableList<FileGroup> fileGroups = FXCollections.observableArrayList();
+        fileGroups.addAll(group1, group2);
+
+        List<String> ignoredFiles = new ArrayList<>(Arrays.asList("someTextFile.txt", "someFile.pdf", "someExeFile.exe"));
+
+        FolderAnalysisResult result = new FolderAnalysisResult(mockFolder.getPath(), fileGroups, ignoredFiles);
         return result;
     }
 
