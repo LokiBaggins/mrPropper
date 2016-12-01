@@ -2,11 +2,12 @@ package by.baggins.controller;
 
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -16,7 +17,9 @@ import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.DuplicatedProperty;
 import by.baggins.dto.DuplicatedPropertyValue;
 import by.baggins.dto.DuplicatesSearchResult;
+import by.baggins.dto.FileGroup;
 import by.baggins.dto.FileInfo;
+import by.baggins.dto.FolderAnalysisResult;
 import by.baggins.service.CompareService;
 import by.baggins.service.CompareServiceImpl;
 import by.baggins.service.DuplicatedPropertiesFinder;
@@ -72,21 +75,32 @@ public class ApplicationController {
     }
     
     public void compareFilesInDirectory() {
-        ObservableList<FileInfo> fileInfoList = analyzeDirectoryFiles(propsDirectoryPath.getText());
+        FolderAnalysisResult analysisResult = analyzeDirectoryFiles(propsDirectoryPath.getText());
+
+        ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
+        for (FileGroup fileGroup : analysisResult.getFileGroups()) {
+            fileInfoList.addAll(fileGroup.getFiles());
+        }
         fileInfoTable.setItems(fileInfoList);
 
-        Map<String, Properties> fileMapping = getFilePropertiesMapping(fileInfoList);
-        ComparisonSummary summary = comparator.compareProperties(fileMapping);
+//        Map<String, Properties> fileMapping = getFilePropertiesMapping(fileInfoList);
+//        ComparisonSummary summary = comparator.compareProperties(fileMapping);
+
+//        resultsArea.clear();
+//        resultsArea.setText(printComparisonSummary(summary));
+//        System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
+
+
+        List<ComparisonSummary> groupSummaries = new ArrayList<>();
+        for (FileGroup fileGroup : analysisResult.getFileGroups()) {
+            groupSummaries.add(comparator.compareProperties(fileGroup));
+        }
 
         resultsArea.clear();
-        resultsArea.setText(printComparisonSummary(summary));
-
-        System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
-
+        resultsArea.setText(printGroupsComparisonSummaries(groupSummaries));
     }
 
-    public ObservableList<FileInfo> analyzeDirectoryFiles(String dirPath) {
-//        String dirPath = propsDirectoryPath.getText();
+    public FolderAnalysisResult analyzeDirectoryFiles(String dirPath) {
 
         if (dirPath == null || dirPath.equals("")) {
 //            TODO: throw user-readable exception and handle it
@@ -95,49 +109,88 @@ public class ApplicationController {
         }
 
         File dir = new File(dirPath);
-        FilenameFilter propsFilter = (dir1, name) -> name.toLowerCase().endsWith(".properties");
-        File[] propsFiles = dir.listFiles(propsFilter);
+//        leaves files only
+        FileFilter dirFilesFilter = File::isFile;
+        File[] dirFiles = dir.listFiles(dirFilesFilter);
 
-        if (propsFiles == null || propsFiles.length == 0){
+//        sorting files to .properties and ignored ones
+        List<File> propsFiles = new ArrayList<>();
+        List<File> ignoredFiles = new ArrayList<>();
+        for (File file : dirFiles) {
+            if (!file.getName().toLowerCase().endsWith(".properties") || !file.getName().matches("_\\w\\w\\.properties$")) {
+                ignoredFiles.add(file);
+            }
+
+            propsFiles.add(file);
+        }
+
+        if (propsFiles.isEmpty()){
 //            TODO: throw user-readable exception and handle it
-            System.out.println("No files found in dir '" + dir + "'");
+            System.out.println("No \"..._XX.properties\" files found in dir '" + dir + "'");
             return null;
         }
 
-        ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
-        for (File propsFile : propsFiles) {
-            String fileType = "";
-            String fileName = propsFile.getName();
+        ObservableList<FileGroup> fileGroups = groupFilesByNamePattern(propsFiles);
 
-            if (propsFile.isFile()) {
-                fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-                fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
-//                TODO: replace with logger
-                System.out.println("File " + propsFile.getName());
-            } else if (propsFile.isDirectory()) {
-                fileType = "DIR";
-//                TODO: replace with logger
-                System.out.println("Directory " + fileName);
-            }
+        return new FolderAnalysisResult(dirPath, fileGroups);
 
-            Properties fileProps = getFilePropertiesUTF8(propsFile);
-            if (fileProps == null) {
-                fileProps = new Properties();
-            }
-
-            DuplicatesSearchResult duplicates = duplicatesFinder.checkFileForDuplicates(propsFile);
-//                TODO: replace with logger
-            System.out.println("\tduplicates: " + duplicates);
-
-            FileInfo fileInfo = new FileInfo(fileName, fileType, fileProps, duplicates);
-            fileInfoList.add(fileInfo);
-        }
-
-        return fileInfoList;
-
+//        TODO: collect ignored files names to separate list
     }
 
-    private static Properties getFilePropertiesUTF8(File file) {
+    private ObservableList<FileGroup> groupFilesByNamePattern(List<File> files) {
+        ObservableList<FileGroup> result = FXCollections.observableArrayList();
+        ObservableList<FileInfo> groupFilesInfo = FXCollections.observableArrayList();
+        File groupingFile = files.get(0);
+        String shortFileName = groupingFile.getName().substring(0, groupingFile.getName().lastIndexOf("_") + 1);
+        String fileNamePattern = "^" + shortFileName + "[a-zA-Z]{2}.properties";
+        Iterator<File> iterator = files.iterator();
+
+        while (iterator.hasNext()) {
+            File file = iterator.next();
+
+            if (file.getName().matches(fileNamePattern)) {
+                FileInfo fileInfo = getFileInfo(file);
+                groupFilesInfo.add(fileInfo);
+
+                iterator.remove();
+            }
+        }
+        result.add(new FileGroup(shortFileName, groupFilesInfo));
+
+        if (files.size() > 0) {
+            result.addAll(groupFilesByNamePattern(files));
+        }
+
+        System.out.println("groupFilesByNamePattern:" + result);
+
+        return result;
+    }
+
+    private FileInfo getFileInfo(File propsFile) {
+        String fileType = "";
+        String fileName = propsFile.getName();
+
+        if (propsFile.isFile()) {
+            fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+            fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
+//                TODO: replace with logger
+            System.out.println("File " + propsFile.getName());
+        }
+
+        Properties fileProps = getFilePropertiesUTF8(propsFile);
+        if (fileProps == null) {
+            fileProps = new Properties();
+        }
+
+        DuplicatesSearchResult duplicates = duplicatesFinder.checkFileForDuplicates(propsFile);
+//                TODO: replace with logger
+        System.out.println("\tduplicates: " + duplicates);
+
+        return new FileInfo(fileName, fileType, fileProps, duplicates);
+    }
+
+    private Properties getFilePropertiesUTF8(File file) {
+
         Properties properties = new Properties();
 
         try (FileInputStream inputStream = new FileInputStream(file);
@@ -175,16 +228,6 @@ public class ApplicationController {
         }
     }
 
-//TODO: refactor ConversionsService and remove this method
-    private Map<String, Properties> getFilePropertiesMapping(ObservableList<FileInfo> fileList){
-        Map<String, Properties> result = new HashMap<>();
-
-        for (FileInfo fileInfo : fileList) {
-            result.put(fileInfo.getFileName(), fileInfo.getProperties());
-        }
-        return result;
-    }
-
     private String printFileDuplicates(DuplicatesSearchResult fileDuplicates) {
         String newLine = System.getProperty("line.separator");
 
@@ -216,6 +259,17 @@ public class ApplicationController {
         }
 
         return resultBuilder.toString();
+    }
+
+    private String printGroupsComparisonSummaries(List<ComparisonSummary> summaryList) {
+        StringBuilder resultsText = new StringBuilder();
+
+        for (ComparisonSummary groupSummary : summaryList) {
+            resultsText.append(printComparisonSummary(groupSummary));
+            resultsText.append("\n=========================================\n");
+        }
+
+        return resultsText.toString();
     }
 
     private String printComparisonSummary(ComparisonSummary summary) {

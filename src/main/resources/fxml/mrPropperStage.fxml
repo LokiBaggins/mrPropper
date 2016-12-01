@@ -23,6 +23,7 @@
                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                             </columnResizePolicy>
                             <columns>
+                                <!--TODO: add file groups coloring and notNull duplicates cells coloring-->
                                 <TableColumn fx:id="fileNameColumn" prefWidth="166.0" text="File Name" />
                                 <TableColumn fx:id="fileTypeColumn" minWidth="0.0" prefWidth="87.0" text="Type" />
                                 <TableColumn fx:id="propertiesNumberColumn" minWidth="0.0" prefWidth="105.0" text="Total keys" />

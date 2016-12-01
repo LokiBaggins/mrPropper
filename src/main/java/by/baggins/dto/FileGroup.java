@@ -29,4 +29,12 @@ public class FileGroup {
     public void setFiles(ObservableList<FileInfo> files) {
         this.files = files;
     }
+
+    @Override
+    public String toString() {
+        return "FileGroup{" +
+                "name='" + name + '\'' +
+                ", files=" + files +
+                '}';
+    }
 }
