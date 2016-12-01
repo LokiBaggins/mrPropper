@@ -72,7 +72,7 @@ public class ApplicationController {
     }
     
     public void compareFilesInDirectory() {
-        ObservableList<FileInfo> fileInfoList = analyzeDirectoryFiles();
+        ObservableList<FileInfo> fileInfoList = analyzeDirectoryFiles(propsDirectoryPath.getText());
         fileInfoTable.setItems(fileInfoList);
 
         Map<String, Properties> fileMapping = getFilePropertiesMapping(fileInfoList);
@@ -85,8 +85,8 @@ public class ApplicationController {
 
     }
 
-    public ObservableList<FileInfo> analyzeDirectoryFiles() {
-        String dirPath = propsDirectoryPath.getText();
+    public ObservableList<FileInfo> analyzeDirectoryFiles(String dirPath) {
+//        String dirPath = propsDirectoryPath.getText();
 
         if (dirPath == null || dirPath.equals("")) {
 //            TODO: throw user-readable exception and handle it
@@ -165,11 +165,12 @@ public class ApplicationController {
             if (fileDuplicates != null && fileDuplicates.getFullDuplicates() != null && fileDuplicates.getKeyDuplicates() != null) {
                 keyDuplicatesLabel.setText(String.valueOf(fileDuplicates.getKeyDuplicates().size()));
                 fullDuplicatesLabel.setText(String.valueOf(fileDuplicates.getFullDuplicates().size()));
-                fileDuplicatesArea.setText(prettyPrintFileDuplicates(fileDuplicates));
+                fileDuplicatesArea.setText(printFileDuplicates(fileDuplicates));
             }
         }
     }
 
+//TODO: refactor ConversionsService and remove this method
     private Map<String, Properties> getFilePropertiesMapping(ObservableList<FileInfo> fileList){
         Map<String, Properties> result = new HashMap<>();
 
@@ -179,7 +180,7 @@ public class ApplicationController {
         return result;
     }
 
-    private String prettyPrintFileDuplicates(DuplicatesSearchResult fileDuplicates) {
+    private String printFileDuplicates(DuplicatesSearchResult fileDuplicates) {
         String newLine = System.getProperty("line.separator");
 
         StringBuilder resultBuilder = new StringBuilder();
