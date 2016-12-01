@@ -30,7 +30,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-public class MainController {
+public class ApplicationController {
 
 //    Directory picker block
     @FXML private TextField propsDirectoryPath;
@@ -54,6 +54,7 @@ public class MainController {
     @FXML private TextArea resultsArea;
 
     private DuplicatedPropertiesFinder duplicatesFinder = new DuplicatedPropertiesFinderImpl();
+    private CompareService comparator = new CompareServiceImpl();
 
     @FXML
     private void initialize() {
@@ -70,12 +71,11 @@ public class MainController {
                 (observable, oldValue, newValue) -> showFileDetails(newValue));
     }
     
-    public void handleSelectBtn() {
+    public void compareFilesInDirectory() {
         ObservableList<FileInfo> fileInfoList = analyzeDirectoryFiles();
         fileInfoTable.setItems(fileInfoList);
 
         Map<String, Properties> localeMapping = getFilePropertiesMapping(fileInfoList);
-        CompareService comparator = new CompareServiceImpl();
         ComparisonSummary summary = comparator.compareProperties(localeMapping);
 
         resultsArea.clear();
@@ -85,7 +85,7 @@ public class MainController {
 
     }
 
-    private ObservableList<FileInfo> analyzeDirectoryFiles() {
+    public ObservableList<FileInfo> analyzeDirectoryFiles() {
         String dirPath = propsDirectoryPath.getText();
 
         if (dirPath == null || dirPath.equals("")) {
