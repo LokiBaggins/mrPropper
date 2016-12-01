@@ -10,6 +10,7 @@ import by.baggins.dto.ComparisonSummary;
 
 public class CompareServiceImpl implements CompareService {
 
+//    TODO: replace param with List<FileInfo>
     @Override
     public ComparisonSummary compareProperties(Map<String, Properties> incomingBundle) {
         //  TODO: remove sout

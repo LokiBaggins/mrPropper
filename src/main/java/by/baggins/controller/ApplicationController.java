@@ -75,8 +75,8 @@ public class ApplicationController {
         ObservableList<FileInfo> fileInfoList = analyzeDirectoryFiles();
         fileInfoTable.setItems(fileInfoList);
 
-        Map<String, Properties> localeMapping = getFilePropertiesMapping(fileInfoList);
-        ComparisonSummary summary = comparator.compareProperties(localeMapping);
+        Map<String, Properties> fileMapping = getFilePropertiesMapping(fileInfoList);
+        ComparisonSummary summary = comparator.compareProperties(fileMapping);
 
         resultsArea.clear();
         resultsArea.setText(printComparisonSummary(summary));

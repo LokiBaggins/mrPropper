@@ -6,33 +6,33 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import by.baggins.FileMocker;
 import by.baggins.dto.DuplicatedProperty;
 import by.baggins.dto.DuplicatedPropertyValue;
 import by.baggins.dto.DuplicatesSearchResult;
 
-import static org.junit.Assert.assertEquals;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class DuplicatedPropsFinderImplTest {
     private DuplicatedPropertiesFinderImpl duplicator = new DuplicatedPropertiesFinderImpl();
-    private static String resourceDirPath = "src\\test\\resources\\";
     private static File fileWithDuplicatesMixed;
     private static File fileWithDuplicatesKeyOnly;
     private static File fileWithDuplicatesFullOnly;
     private static File fileWithoutDuplicates;
+    private static FileMocker fileMocker = new FileMocker("src\\test\\resources\\");
 
     @BeforeClass
     public static void createMockFile() {
-        fileWithDuplicatesMixed = createFileWithDuplicatesMixed("test_duplicates_mixed.properties");
-        fileWithDuplicatesKeyOnly = createFileWithDuplicatesKeyOnly("test_duplicates_keyOnly.properties");
-        fileWithDuplicatesFullOnly = createFileWithDuplicatesFullOnly("test_duplicates_fullOnly.properties");
-        fileWithoutDuplicates = createFileWithoutDuplicates("test_no_duplicates.properties");
+        fileWithDuplicatesMixed = fileMocker.createFileWithDuplicatesMixed("test_duplicates_mixed.properties");
+        fileWithDuplicatesKeyOnly = fileMocker.createFileWithDuplicatesKeyOnly("test_duplicates_keyOnly.properties");
+        fileWithDuplicatesFullOnly = fileMocker.createFileWithDuplicatesFullOnly("test_duplicates_fullOnly.properties");
+        fileWithoutDuplicates = fileMocker.createValidFile1("test_no_duplicates.properties");
 
     }
 
@@ -93,116 +93,6 @@ public class DuplicatedPropsFinderImplTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static File createFileWithDuplicatesMixed(String fileName) {
-        File resultFile = new File(resourceDirPath + fileName);
-
-        try {
-//            if file not exists trying to create it and throwing exception if failed
-            if (!resultFile.exists() && !resultFile.createNewFile()){
-                throw new RuntimeException("Error while creating mock file " + fileName);
-            }
-
-            PrintWriter writer = new PrintWriter(resultFile, "UTF-8");
-            writer.println("p1=one");
-            writer.println("p1=раз");
-            writer.println("p2=two");
-            writer.println("p2=two");
-            writer.println("p3=three");
-            writer.println("p4=four");
-            writer.println("p4=four");
-            writer.println("p1=ещё раз");
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Mock file created: " + resultFile.getName());
-
-        return resultFile;
-    }
-
-    private static File createFileWithDuplicatesKeyOnly(String fileName) {
-        File resultFile = new File(resourceDirPath + fileName);
-
-        try {
-//            if file not exists trying to create it and throwing exception if failed
-            if (!resultFile.exists() && !resultFile.createNewFile()){
-                throw new RuntimeException("Error while creating mock file " + fileName);
-            }
-
-            PrintWriter writer = new PrintWriter(resultFile, "UTF-8");
-            writer.println("p1=one");
-            writer.println("p1=раз");
-            writer.println("p2=two");
-            writer.println("p3=three");
-            writer.println("p4=four");
-            writer.println("p4=четыре");
-            writer.println("p4=ещё четыре");
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Mock file created: " + resultFile.getName());
-
-        return resultFile;
-    }
-
-    private static File createFileWithDuplicatesFullOnly(String fileName) {
-        File resultFile = new File(resourceDirPath + fileName);
-
-        try {
-//            if file not exists trying to create it and throwing exception if failed
-            if (!resultFile.exists() && !resultFile.createNewFile()){
-                throw new RuntimeException("Error while creating mock file " + fileName);
-            }
-
-            PrintWriter writer = new PrintWriter(resultFile, "UTF-8");
-            writer.println("p1=one");
-            writer.println("p1=one");
-            writer.println("p2=two");
-            writer.println("p3=three");
-            writer.println("p4=four");
-            writer.println("p4=four");
-            writer.println("p1=one");
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Mock file created: " + resultFile.getName());
-
-        return resultFile;
-    }
-
-    private static File createFileWithoutDuplicates(String fileName) {
-        File resultFile = new File(resourceDirPath + fileName);
-
-        try {
-//            if file not exists trying to create it and throwing exception if failed
-            if (!resultFile.exists() && !resultFile.createNewFile()){
-                throw new RuntimeException("Error while creating mock file " + fileName);
-            }
-
-            PrintWriter writer = new PrintWriter(resultFile, "UTF-8");
-            writer.println("p1=one");
-            writer.println("p2=two");
-            writer.println("p3=three");
-            writer.println("p4=four");
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Mock file created: " + resultFile.getName());
-
-        return resultFile;
     }
 
     private DuplicatesSearchResult getDuplicatesSearchResultMixed() {
