@@ -12,7 +12,6 @@ import by.baggins.FileMocker;
 import by.baggins.MocksDuplicatesSerachResults;
 import by.baggins.dto.DuplicatesSearchResult;
 
-import static by.baggins.MocksDuplicatesSerachResults.getDuplicatesSearchResultMixed;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;

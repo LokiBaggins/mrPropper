@@ -3,6 +3,7 @@ package by.baggins.controller;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -10,7 +11,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import by.baggins.FileMocker;
 import by.baggins.MocksDuplicatesSerachResults;
@@ -19,16 +22,18 @@ import by.baggins.dto.FileInfo;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import static org.junit.Assert.*;
+
 public class ApplicationControllerTest {
     private static File mockFolder = new File("src\\test\\resources\\mockFolder");
     private static FileMocker fileMocker = new FileMocker(mockFolder.getPath() + "\\");
-    private static File validFile1 = new File("validFile_xx.properties");
-    private static File validFile2 = new File("validFile_yy.properties");
-    private static File validFile3 = new File("validFile_zz.properties");
+    private static File validFile1;
+    private static File validFile2;
+    private static File validFile3;
     private static File fileWithDuplicatesMixed;
     private static File fileWithDuplicatesKeyOnly;
     private static File fileWithDuplicatesFullOnly;
-    private static ObservableList<FileInfo> expectedResult;
+    private static ObservableList<FileInfo> expectedFileInfoList;
 
     @BeforeClass
     public static void createMockFolder() {
@@ -42,23 +47,34 @@ public class ApplicationControllerTest {
             e.printStackTrace();
         }
 
-        fileMocker.createValidFile1(validFile1.getName());
-        fileMocker.createValidFile2(validFile2.getName());
-        fileMocker.createValidFile3(validFile3.getName());
-
+        validFile1 = fileMocker.createValidFile1("validFile_xx.properties");
+        validFile2 = fileMocker.createValidFile2("validFile_yy.properties");
+        validFile3 = fileMocker.createValidFile3("validFile_zz.properties");
         fileWithDuplicatesMixed = fileMocker.createFileWithDuplicatesMixed("duplicates_file_xx.properties");
         fileWithDuplicatesKeyOnly = fileMocker.createFileWithDuplicatesFullOnly("duplicates_file_yy.properties");
         fileWithDuplicatesFullOnly = fileMocker.createFileWithDuplicatesKeyOnly("duplicates_file_zz.properties");
         fileMocker.createNotPropertiesFiles("someTextFile.txt", "someFile.pdf", "someExeFile.exe"); // here you are welcome to set any filenames with extensions different of ".properties". Any of such files must be ignored by application
 
-        expectedResult = getExcpectedAnalysisResult();
+        expectedFileInfoList = getExcpectedAnalysisResult();
     }
 
     @Test
-    public void testAnalyzeDirectoryFiles_filteringByExtension() throws Exception {
+    public void testAnalyzeDirectoryFiles_filteringFilesByExtension() {
         ObservableList<FileInfo> actualFileInfoList = new ApplicationController().analyzeDirectoryFiles(mockFolder.getPath());
+        assertEquals(expectedFileInfoList.size(), actualFileInfoList.size());
 
 
+        List<String> actualFileTypes = actualFileInfoList.stream().map(FileInfo::getFileType).collect(Collectors.toList());
+        for (String fileType : actualFileTypes) {
+            assertEquals("properties", fileType);
+        }
+    }
+
+    @Ignore("No even idea of how this grouping must be implemented, so how to test it")
+    @Test
+    public void testAnalyzeDirectoryFiles_groupingFilesByNamePattern() {
+
+        fail("Not implemented.");
     }
 
     @AfterClass
@@ -96,20 +112,26 @@ public class ApplicationControllerTest {
 
         String fileName = file.getName().substring(0, file.getName().lastIndexOf('.'));
         String fileType = file.getName().substring(file.getName().indexOf('.') + 1);
-        Properties validFile1Props = getFilePropertiesUTF8(file);
+        Properties fileProps = getFilePropertiesUTF8(file);
 
-        return new FileInfo(fileName, fileType, validFile1Props, duplicates);
+        return new FileInfo(fileName, fileType, fileProps, duplicates);
     }
 
     private static Properties getFilePropertiesUTF8(File file) {
         Properties properties = new Properties();
-        try {
-            properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+
+        try (FileInputStream inputStream = new FileInputStream(file);
+             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+        ) {
+            properties.load(inputStreamReader);
+            return properties;
+
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
-        return properties;
+
+        return null;
     }
+
 
 }
