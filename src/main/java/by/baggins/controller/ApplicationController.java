@@ -33,29 +33,43 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.DirectoryChooser;
 
 public class ApplicationController {
 
-//    Directory picker block
-    @FXML private TextField propsDirectoryPath;
+    //    Directory picker block
+    @FXML
+    private TextField directoryPathInput;
 
-//    Directory info pane
-    @FXML private TableView<FileInfo> fileInfoTable;
-    @FXML private TableColumn<FileInfo, String> fileNameColumn;
-    @FXML private TableColumn<FileInfo, String> fileTypeColumn;
-    @FXML private TableColumn<FileInfo, Integer> propertiesNumberColumn;
-    @FXML private TableColumn<FileInfo, Integer> duplicatesNumberColumn;
+    //    Directory info pane
+    @FXML
+    private TableView<FileInfo> fileInfoTable;
+    @FXML
+    private TableColumn<FileInfo, String> fileNameColumn;
+    @FXML
+    private TableColumn<FileInfo, String> fileTypeColumn;
+    @FXML
+    private TableColumn<FileInfo, Integer> propertiesNumberColumn;
+    @FXML
+    private TableColumn<FileInfo, Integer> duplicatesNumberColumn;
 
-//    File details pane
-    @FXML private Label fileNameLabel;
-    @FXML private Label propertiesNumberLabel;
-    @FXML private Label duplicatesNumberLabel;
-    @FXML private Label keyDuplicatesLabel;
-    @FXML private Label fullDuplicatesLabel;
-    @FXML private TextArea fileDuplicatesArea;
+    //    File details pane
+    @FXML
+    private Label fileNameLabel;
+    @FXML
+    private Label propertiesNumberLabel;
+    @FXML
+    private Label duplicatesNumberLabel;
+    @FXML
+    private Label keyDuplicatesLabel;
+    @FXML
+    private Label fullDuplicatesLabel;
+    @FXML
+    private TextArea fileDuplicatesArea;
 
-//    Bundle comparison result block
-    @FXML private TextArea resultsArea;
+    //    Bundle comparison result block
+    @FXML
+    private TextArea resultsArea;
 
     private DuplicatedPropertiesFinder duplicatesFinder = new DuplicatedPropertiesFinderImpl();
     private CompareService comparator = new CompareServiceImpl();
@@ -86,8 +100,24 @@ public class ApplicationController {
     }
 
     @FXML
+    public void chooseDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+
+        directoryChooser.setTitle("Select bundle directory");
+        directoryChooser.setInitialDirectory(new File("."));
+
+        //Show open file dialog
+        File dir = directoryChooser.showDialog(null);
+
+        if (dir != null) {
+            directoryPathInput.setText(dir.getPath());
+            analyzeDirectoryFiles();
+        }
+    }
+
+
     public void analyzeDirectoryFiles() {
-        String dirPath = propsDirectoryPath.getText();
+        String dirPath = directoryPathInput.getText();
 
         if (dirPath == null || dirPath.equals("")) {
 //            TODO: throw user-readable exception and handle it
@@ -114,7 +144,7 @@ public class ApplicationController {
         System.out.println("Props files: " + propsFiles);
         System.out.println("Ignored files: " + ignoredFilesNames);
 
-        if (propsFiles.isEmpty()){
+        if (propsFiles.isEmpty()) {
 //            TODO: throw user-readable exception and handle it
             throw new RuntimeException("No \"..._XX.properties\" files found in dir '" + dir + "'");
         }
@@ -125,7 +155,7 @@ public class ApplicationController {
         displayFolderAnalysisResult();
     }
 
-    private void displayFolderAnalysisResult(){
+    private void displayFolderAnalysisResult() {
         ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
         for (FileGroup fileGroup : folderAnalysisResult.getFileGroups()) {
             fileInfoList.addAll(fileGroup.getFiles());
