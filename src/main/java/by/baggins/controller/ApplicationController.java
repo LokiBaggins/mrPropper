@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.DuplicatedProperty;
@@ -58,6 +59,7 @@ public class ApplicationController {
 
     private DuplicatedPropertiesFinder duplicatesFinder = new DuplicatedPropertiesFinderImpl();
     private CompareService comparator = new CompareServiceImpl();
+    private FolderAnalysisResult folderAnalysisResult;
 
     @FXML
     private void initialize() {
@@ -73,41 +75,33 @@ public class ApplicationController {
         fileInfoTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showFileDetails(newValue));
     }
-    
+
+    @FXML
     public void compareFilesInDirectory() {
-        FolderAnalysisResult analysisResult = analyzeDirectoryFiles(propsDirectoryPath.getText());
-
-        ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
-        for (FileGroup fileGroup : analysisResult.getFileGroups()) {
-            fileInfoList.addAll(fileGroup.getFiles());
-        }
-        fileInfoTable.setItems(fileInfoList);
-
-//        Map<String, Properties> fileMapping = getFilePropertiesMapping(fileInfoList);
-//        ComparisonSummary summary = comparator.compareProperties(fileMapping);
-
-//        resultsArea.clear();
-//        resultsArea.setText(printComparisonSummary(summary));
-//        System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
-
-
-        List<ComparisonSummary> groupSummaries = new ArrayList<>();
-        for (FileGroup fileGroup : analysisResult.getFileGroups()) {
-            groupSummaries.add(comparator.compareProperties(fileGroup));
-        }
+        List<ComparisonSummary> groupSummaries = folderAnalysisResult.getFileGroups().stream()
+                .map(fileGroup -> comparator.compareProperties(fileGroup))
+                .collect(Collectors.toList());
 
         resultsArea.clear();
-        resultsArea.setText(printGroupsComparisonSummaries(groupSummaries));
+        resultsArea.setText(printGroupsComparisonSummaries(groupSummaries) + printIgnoredFilesList());
     }
 
-    public FolderAnalysisResult analyzeDirectoryFiles(String dirPath) {
+    private String printIgnoredFilesList() {
+
+
+        return "printIgnoredFilesList()";
+    }
+
+    @FXML
+    public void analyzeDirectoryFiles() {
+        String dirPath = propsDirectoryPath.getText();
 
         if (dirPath == null || dirPath.equals("")) {
 //            TODO: throw user-readable exception and handle it
-            System.out.println("Empty directory path");
-            return null;
+            throw new RuntimeException("Empty directory path");
         }
 
+//        surround with try/catch
         File dir = new File(dirPath);
 //        leaves files only
         FileFilter dirFilesFilter = File::isFile;
@@ -115,10 +109,10 @@ public class ApplicationController {
 
 //        sorting files to .properties and ignored ones
         List<File> propsFiles = new ArrayList<>();
-        List<File> ignoredFiles = new ArrayList<>();
+        List<String> ignoredFilesNames = new ArrayList<>();
         for (File file : dirFiles) {
             if (!file.getName().toLowerCase().endsWith(".properties") || !file.getName().matches("_\\w\\w\\.properties$")) {
-                ignoredFiles.add(file);
+                ignoredFilesNames.add(file.getName());
             }
 
             propsFiles.add(file);
@@ -126,15 +120,21 @@ public class ApplicationController {
 
         if (propsFiles.isEmpty()){
 //            TODO: throw user-readable exception and handle it
-            System.out.println("No \"..._XX.properties\" files found in dir '" + dir + "'");
-            return null;
+            throw new RuntimeException("No \"..._XX.properties\" files found in dir '" + dir + "'");
         }
 
         ObservableList<FileGroup> fileGroups = groupFilesByNamePattern(propsFiles);
+        folderAnalysisResult = new FolderAnalysisResult(dirPath, fileGroups, ignoredFilesNames);
 
-        return new FolderAnalysisResult(dirPath, fileGroups);
+        displayFolderAnalysisResult();
+    }
 
-//        TODO: collect ignored files names to separate list
+    private void displayFolderAnalysisResult(){
+        ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
+        for (FileGroup fileGroup : folderAnalysisResult.getFileGroups()) {
+            fileInfoList.addAll(fileGroup.getFiles());
+        }
+        fileInfoTable.setItems(fileInfoList);
     }
 
     private ObservableList<FileGroup> groupFilesByNamePattern(List<File> files) {

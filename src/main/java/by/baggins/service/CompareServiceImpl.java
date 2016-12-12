@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.FileGroup;

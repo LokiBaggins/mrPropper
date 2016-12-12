@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -96,6 +97,31 @@ public class ApplicationControllerTest {
     }
 
 
+    @Test
+    public void java8lambdasTest() {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            list.add(i);
+        }
+
+        int  counter = 0;
+        Long start = new Date().getTime();
+        for (Integer li : list) {
+            if (li % 2 == 0) {
+                System.out.print(li);
+                counter++;
+            }
+        }
+        Long stop = new Date().getTime() - start;
+        System.out.println("\nclassic counted " + counter + " evens for " + stop + "ms");
+
+        counter = 0;
+        start = new Date().getTime();
+        long count = list.stream().filter(li -> li % 2 == 0).count();
+        stop = new Date().getTime() - start;
+        System.out.println("\nlambda counted " + count + " evens for " + stop + "ms");
+
+    }
 
     @AfterClass
     public static void removeMockFolderAndFiles() {
