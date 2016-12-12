@@ -82,14 +82,7 @@ public class ApplicationController {
                 .map(fileGroup -> comparator.compareProperties(fileGroup))
                 .collect(Collectors.toList());
 
-        resultsArea.clear();
-        resultsArea.setText(printGroupsComparisonSummaries(groupSummaries) + printIgnoredFilesList());
-    }
-
-    private String printIgnoredFilesList() {
-
-
-        return "printIgnoredFilesList()";
+        resultsArea.appendText(printGroupsComparisonSummaries(groupSummaries));
     }
 
     @FXML
@@ -111,12 +104,15 @@ public class ApplicationController {
         List<File> propsFiles = new ArrayList<>();
         List<String> ignoredFilesNames = new ArrayList<>();
         for (File file : dirFiles) {
-            if (!file.getName().toLowerCase().endsWith(".properties") || !file.getName().matches("_\\w\\w\\.properties$")) {
+            if (!file.getName().toLowerCase().endsWith(".properties") || !file.getName().matches("^.+_[\\w]{2,3}\\.properties$")) {
                 ignoredFilesNames.add(file.getName());
+            } else {
+                propsFiles.add(file);
             }
-
-            propsFiles.add(file);
         }
+
+        System.out.println("Props files: " + propsFiles);
+        System.out.println("Ignored files: " + ignoredFilesNames);
 
         if (propsFiles.isEmpty()){
 //            TODO: throw user-readable exception and handle it
@@ -135,6 +131,24 @@ public class ApplicationController {
             fileInfoList.addAll(fileGroup.getFiles());
         }
         fileInfoTable.setItems(fileInfoList);
+
+        printIgnoredFilesList();
+
+    }
+
+    private void printIgnoredFilesList() {
+        if (!folderAnalysisResult.getIgnoredFilesNames().isEmpty()) {
+            String newLine = System.getProperty("line.separator");
+            resultsArea.clear();
+            StringBuilder ignoredFilesList = new StringBuilder("Files in list below are ignored" + newLine);
+
+            for (String fileName : folderAnalysisResult.getIgnoredFilesNames()) {
+                ignoredFilesList.append(fileName).append(newLine);
+            }
+            ignoredFilesList.append("==============================");
+
+            resultsArea.setText(ignoredFilesList.toString());
+        }
     }
 
     private ObservableList<FileGroup> groupFilesByNamePattern(List<File> files) {
@@ -161,8 +175,6 @@ public class ApplicationController {
             result.addAll(groupFilesByNamePattern(files));
         }
 
-        System.out.println("groupFilesByNamePattern:" + result);
-
         return result;
     }
 
@@ -174,7 +186,7 @@ public class ApplicationController {
             fileName = fileName.substring(0, fileName.lastIndexOf('.'));
             fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
 //                TODO: replace with logger
-            System.out.println("File " + propsFile.getName());
+//            System.out.println("File " + propsFile.getName());
         }
 
         Properties fileProps = getFilePropertiesUTF8(propsFile);
@@ -184,7 +196,7 @@ public class ApplicationController {
 
         DuplicatesSearchResult duplicates = duplicatesFinder.checkFileForDuplicates(propsFile);
 //                TODO: replace with logger
-        System.out.println("\tduplicates: " + duplicates);
+//        System.out.println("\tduplicates: " + duplicates);
 
         return new FileInfo(fileName, fileType, fileProps, duplicates);
     }
