@@ -32,11 +32,15 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
         FileFilter dirFilesFilter = File::isFile;
         File[] dirFiles = dir.listFiles(dirFilesFilter);
 
+        if (dirFiles == null) {
+            throw new RuntimeException("Can't scan files from chosen directory");
+        }
+
 //        sorting files to .properties and ignored ones
         List<File> propsFiles = new ArrayList<>();
         List<String> ignoredFilesNames = new ArrayList<>();
         for (File file : dirFiles) {
-            if (!file.getName().toLowerCase().endsWith(".properties") || !file.getName().matches("^.+_[\\w]{2,3}\\.properties$")) {
+            if (!file.getName().toLowerCase().endsWith(".properties")) {
                 ignoredFilesNames.add(file.getName());
             } else {
                 propsFiles.add(file);
@@ -60,8 +64,8 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
         ObservableList<FileGroup> result = FXCollections.observableArrayList();
         ObservableList<FileInfo> groupFilesInfo = FXCollections.observableArrayList();
         File groupingFile = files.get(0);
-        String shortFileName = groupingFile.getName().substring(0, groupingFile.getName().lastIndexOf("_") + 1);
-        String fileNamePattern = "^" + shortFileName + "[a-zA-Z]{2}.properties";
+        String shortFileName = getShortFileName(groupingFile);
+        String fileNamePattern = "^" + shortFileName + "(_[a-zA-Z]{2})*.properties";
         Iterator<File> iterator = files.iterator();
 
         while (iterator.hasNext()) {
@@ -81,6 +85,17 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
         }
 
         return result;
+    }
+
+    private String getShortFileName(File file) {
+        String fileName = file.getName();
+        String shortFileName = fileName.substring(0, fileName.lastIndexOf("."));
+
+        if (fileName.contains("_")) {
+                shortFileName = fileName.substring(0, fileName.lastIndexOf("_"));
+        }
+
+        return shortFileName;
     }
 
     private FileInfo getFileInfo(File propsFile) {

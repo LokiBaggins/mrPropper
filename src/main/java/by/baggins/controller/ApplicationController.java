@@ -73,6 +73,10 @@ public class ApplicationController {
 
     @FXML
     public void compareFilesInDirectory() {
+        if (folderAnalysisResult == null) {
+            throw new RuntimeException("Select correct directory, please.");
+        }
+
         List<ComparisonSummary> groupSummaries = folderAnalysisResult.getFileGroups().stream()
                 .map(fileGroup -> comparator.compareProperties(fileGroup))
                 .collect(Collectors.toList());
