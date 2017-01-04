@@ -5,11 +5,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="851.0" prefWidth="1234.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.baggins.controller.MainController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="851.0" prefWidth="1234.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.baggins.controller.ApplicationController">
     <children>
-        <TextField fx:id="propsDirectoryPath" layoutX="216.0" layoutY="37.0" prefHeight="25.0" prefWidth="255.0" text="../messages" />
-        <Button fx:id="btnDirectory" layoutX="482.0" layoutY="37.0" mnemonicParsing="false" onAction="#handleSelectBtn" text="Compare" />
-        <Label layoutX="14.0" layoutY="41.0" prefHeight="20.0" prefWidth="246.0" text="Directory, where the files live:">
+        <TextField fx:id="directoryPathInput" layoutX="216.0" layoutY="37.0" prefHeight="25.0" prefWidth="404.0"/>
+        <Button fx:id="chooseDirectoryBtn" layoutX="629.0" layoutY="37.0" mnemonicParsing="false" onAction="#chooseDirectory" text="Choose folder..." />
+        <Button fx:id="btnCompareFiles" layoutX="738.0" layoutY="37.0" mnemonicParsing="false" onAction="#compareFilesInDirectory" text="Compare" />
+        <Label layoutX="14.0" layoutY="39.0" prefHeight="20.0" prefWidth="246.0" text="Directory, where the files live:">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
@@ -23,6 +24,7 @@
                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                             </columnResizePolicy>
                             <columns>
+                                <!--TODO: add file groups coloring and notNull duplicates cells coloring-->
                                 <TableColumn fx:id="fileNameColumn" prefWidth="166.0" text="File Name" />
                                 <TableColumn fx:id="fileTypeColumn" minWidth="0.0" prefWidth="87.0" text="Type" />
                                 <TableColumn fx:id="propertiesNumberColumn" minWidth="0.0" prefWidth="105.0" text="Total keys" />

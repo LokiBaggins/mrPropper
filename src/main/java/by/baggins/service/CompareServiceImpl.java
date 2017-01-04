@@ -5,10 +5,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import by.baggins.dto.ComparisonSummary;
+import by.baggins.dto.FileGroup;
+import by.baggins.dto.FileInfo;
+import javafx.collections.ObservableList;
 
 public class CompareServiceImpl implements CompareService {
+
+    @Override
+    public ComparisonSummary compareProperties(FileGroup fileGroup) {
+        return compareProperties(getFilePropertiesMapping(fileGroup));
+    }
 
     @Override
     public ComparisonSummary compareProperties(Map<String, Properties> incomingBundle) {
@@ -53,11 +62,26 @@ public class CompareServiceImpl implements CompareService {
             }
         }
 
-
 //      TODO: remove sout
 //      Горизонтальная логика сравнения свойств отработала на боевом бандле: "Elapsed time: 16"
         System.out.println("Elapsed time: " + (new Date().getTime() - startTime));
 
         return new ComparisonSummary(resultMap);
+    }
+
+    //TODO: refactor ConversionsService and remove this method
+    private Map<String, Properties> getFilePropertiesMapping(FileGroup fileGroup){
+        ObservableList<FileInfo> fileList = fileGroup.getFiles();
+
+        if (fileList == null) {
+            return null;
+        }
+
+        Map<String, Properties> result = new HashMap<>();
+
+        for (FileInfo fileInfo : fileList) {
+            result.put(fileInfo.getFileName(), fileInfo.getProperties());
+        }
+        return result;
     }
 }

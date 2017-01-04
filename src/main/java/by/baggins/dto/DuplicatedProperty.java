@@ -31,6 +31,28 @@ public class DuplicatedProperty {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DuplicatedProperty)) return false;
+
+        DuplicatedProperty that = (DuplicatedProperty) o;
+
+        if (getMsgKey() != null ? !getMsgKey().equals(that.getMsgKey()) : that.getMsgKey() != null)
+            return false;
+        if (getValues() != null ? !getValues().equals(that.getValues()) : that.getValues() != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getMsgKey() != null ? getMsgKey().hashCode() : 0;
+        result = 31 * result + (getValues() != null ? getValues().hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "DuplicatedProperty{" +
                 "msgKey='" + msgKey + '\'' +

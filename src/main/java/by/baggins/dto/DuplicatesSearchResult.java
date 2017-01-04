@@ -34,6 +34,26 @@ public class DuplicatesSearchResult {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DuplicatesSearchResult)) return false;
+
+        DuplicatesSearchResult that = (DuplicatesSearchResult) o;
+
+        if (getKeyDuplicates() != null ? !getKeyDuplicates().equals(that.getKeyDuplicates()) : that.getKeyDuplicates() != null)
+            return false;
+        return getFullDuplicates() != null ? getFullDuplicates().equals(that.getFullDuplicates()) : that.getFullDuplicates() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getKeyDuplicates() != null ? getKeyDuplicates().hashCode() : 0;
+        result = 31 * result + (getFullDuplicates() != null ? getFullDuplicates().hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "DuplicatesSearchResult{" +
                 "keyDuplicates=" + keyDuplicates +

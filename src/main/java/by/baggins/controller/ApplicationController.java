@@ -2,25 +2,22 @@ package by.baggins.controller;
 
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.DuplicatedProperty;
 import by.baggins.dto.DuplicatedPropertyValue;
 import by.baggins.dto.DuplicatesSearchResult;
+import by.baggins.dto.FileGroup;
 import by.baggins.dto.FileInfo;
+import by.baggins.dto.FolderAnalysisResult;
 import by.baggins.service.CompareService;
 import by.baggins.service.CompareServiceImpl;
-import by.baggins.service.DuplicatedPropertiesFinder;
-import by.baggins.service.DuplicatedPropertiesFinderImpl;
+import by.baggins.service.FolderAnalysisService;
+import by.baggins.service.FolderAnalysisServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -29,20 +26,22 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.DirectoryChooser;
 
-public class MainController {
+public class ApplicationController {
 
-//    Directory picker block
-    @FXML private TextField propsDirectoryPath;
+    //    Directory picker block
+    @FXML
+    private TextField directoryPathInput;
 
-//    Directory info pane
+    //    Directory info pane
     @FXML private TableView<FileInfo> fileInfoTable;
     @FXML private TableColumn<FileInfo, String> fileNameColumn;
     @FXML private TableColumn<FileInfo, String> fileTypeColumn;
     @FXML private TableColumn<FileInfo, Integer> propertiesNumberColumn;
     @FXML private TableColumn<FileInfo, Integer> duplicatesNumberColumn;
 
-//    File details pane
+    //    File details pane
     @FXML private Label fileNameLabel;
     @FXML private Label propertiesNumberLabel;
     @FXML private Label duplicatesNumberLabel;
@@ -50,10 +49,12 @@ public class MainController {
     @FXML private Label fullDuplicatesLabel;
     @FXML private TextArea fileDuplicatesArea;
 
-//    Bundle comparison result block
+    //    Bundle comparison result block
     @FXML private TextArea resultsArea;
 
-    private DuplicatedPropertiesFinder duplicatesFinder = new DuplicatedPropertiesFinderImpl();
+    private FolderAnalysisService folderAnalyzer = new FolderAnalysisServiceImpl();
+    private CompareService comparator = new CompareServiceImpl();
+    private FolderAnalysisResult folderAnalysisResult;
 
     @FXML
     private void initialize() {
@@ -69,94 +70,63 @@ public class MainController {
         fileInfoTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> showFileDetails(newValue));
     }
-    
-    public void handleSelectBtn() {
-        ObservableList<FileInfo> fileInfoList = analyzeDirectoryFiles();
+
+    @FXML
+    public void compareFilesInDirectory() {
+        if (folderAnalysisResult == null) {
+            throw new RuntimeException("Select correct directory, please.");
+        }
+
+        List<ComparisonSummary> groupSummaries = folderAnalysisResult.getFileGroups().stream()
+                .map(fileGroup -> comparator.compareProperties(fileGroup))
+                .collect(Collectors.toList());
+
+        resultsArea.appendText(printGroupsComparisonSummaries(groupSummaries));
+    }
+
+    @FXML
+    public void chooseDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+
+        directoryChooser.setTitle("Select bundle directory");
+        directoryChooser.setInitialDirectory(new File("."));
+
+        //Show open file dialog
+        File dir = directoryChooser.showDialog(null);
+
+        if (dir != null) {
+            directoryPathInput.setText(dir.getPath());
+            folderAnalysisResult = folderAnalyzer.analyzeDirectoryFiles(dir.getPath());
+
+            displayFolderAnalysisResult();
+        }
+    }
+
+    private void displayFolderAnalysisResult() {
+        ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
+        for (FileGroup fileGroup : folderAnalysisResult.getFileGroups()) {
+            fileInfoList.addAll(fileGroup.getFiles());
+        }
+        
         fileInfoTable.setItems(fileInfoList);
 
-        Map<String, Properties> localeMapping = getFilePropertiesMapping(fileInfoList);
-        CompareService comparator = new CompareServiceImpl();
-        ComparisonSummary summary = comparator.compareProperties(localeMapping);
-
-        resultsArea.clear();
-        StringBuilder resultsText = new StringBuilder();
-        for (String fileName : summary.getToBeTranslated().keySet()) {
-            Set<Map.Entry<Object, Object>> props = summary.getToBeTranslated().get(fileName).entrySet();
-            resultsText.append("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
-            for (Map.Entry<Object, Object> prop : props) {
-                resultsText.append(prop.getKey() + "=" + prop.getValue() + "\n\t");
-            }
-        }
-        resultsArea.setText(resultsText.toString());
-
-        System.out.println("ComparisonSummary: " + summary.getToBeTranslated().toString());
-
-
+        printIgnoredFilesList();
     }
 
-    private ObservableList<FileInfo> analyzeDirectoryFiles() {
-        String dirPath = propsDirectoryPath.getText();
+    private void printIgnoredFilesList() {
+        if (!folderAnalysisResult.getIgnoredFilesNames().isEmpty()) {
+            String newLine = System.getProperty("line.separator");
+            resultsArea.clear();
+            StringBuilder ignoredFilesList = new StringBuilder("Files in list below are ignored" + newLine);
 
-        if (dirPath == null || dirPath.equals("")) {
-//            TODO: throw user-readable exception and handle it
-            System.out.println("Empty directory path");
-            return null;
-        }
-
-        File dir = new File(dirPath);
-        FilenameFilter propsFilter = (dir1, name) -> name.toLowerCase().endsWith(".properties");
-        File[] propsFiles = dir.listFiles(propsFilter);
-
-        if (propsFiles == null || propsFiles.length == 0){
-//            TODO: throw user-readable exception and handle it
-            System.out.println("No files found in dir '" + dir + "'");
-            return null;
-        }
-
-        ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
-        for (File propsFile : propsFiles) {
-            String fileType = "";
-            String fileName = propsFile.getName();
-
-            if (propsFile.isFile()) {
-                fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-                fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
-//                TODO: replace with logger
-                System.out.println("File " + propsFile.getName());
-            } else if (propsFile.isDirectory()) {
-                fileType = "DIR";
-//                TODO: replace with logger
-                System.out.println("Directory " + fileName);
+            for (String fileName : folderAnalysisResult.getIgnoredFilesNames()) {
+                ignoredFilesList.append(fileName).append(newLine);
             }
+            ignoredFilesList.append("==============================");
 
-            Properties fileProps = getFilePropertiesUTF8(propsFile);
-            if (fileProps == null) {
-                fileProps = new Properties();
-            }
-
-            DuplicatesSearchResult duplicates = duplicatesFinder.checkFileForDuplicates(propsFile);
-//                TODO: replace with logger
-            System.out.println("\tduplicates: " + duplicates);
-
-            FileInfo fileInfo = new FileInfo(fileName, fileType, fileProps, duplicates);
-            fileInfoList.add(fileInfo);
+            resultsArea.setText(ignoredFilesList.toString());
         }
-
-        return fileInfoList;
-
     }
-
-    private Properties getFilePropertiesUTF8(File file) {
-        Properties properties = new Properties();
-        try {
-            properties.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return properties;
-    }
-
 
     private void showFileDetails(FileInfo fileInfo) {
         fileNameLabel.setText("Choose a file for detail info");
@@ -175,21 +145,12 @@ public class MainController {
             if (fileDuplicates != null && fileDuplicates.getFullDuplicates() != null && fileDuplicates.getKeyDuplicates() != null) {
                 keyDuplicatesLabel.setText(String.valueOf(fileDuplicates.getKeyDuplicates().size()));
                 fullDuplicatesLabel.setText(String.valueOf(fileDuplicates.getFullDuplicates().size()));
-                fileDuplicatesArea.setText(prettyPrintFileDuplicates(fileDuplicates));
+                fileDuplicatesArea.setText(printFileDuplicates(fileDuplicates));
             }
         }
     }
 
-    private Map<String, Properties> getFilePropertiesMapping(ObservableList<FileInfo> fileList){
-        Map<String, Properties> result = new HashMap<>();
-
-        for (FileInfo fileInfo : fileList) {
-            result.put(fileInfo.getFileName(), fileInfo.getProperties());
-        }
-        return result;
-    }
-
-    private String prettyPrintFileDuplicates(DuplicatesSearchResult fileDuplicates) {
+    private String printFileDuplicates(DuplicatesSearchResult fileDuplicates) {
         String newLine = System.getProperty("line.separator");
 
         StringBuilder resultBuilder = new StringBuilder();
@@ -220,6 +181,32 @@ public class MainController {
         }
 
         return resultBuilder.toString();
+    }
+
+    private String printGroupsComparisonSummaries(List<ComparisonSummary> summaryList) {
+        StringBuilder resultsText = new StringBuilder();
+
+        for (ComparisonSummary groupSummary : summaryList) {
+            resultsText.append(printComparisonSummary(groupSummary));
+            resultsText.append("\n=========================================\n");
+        }
+
+        return resultsText.toString();
+    }
+
+    private String printComparisonSummary(ComparisonSummary summary) {
+        StringBuilder resultsText = new StringBuilder();
+
+        for (String fileName : summary.getToBeTranslated().keySet()) {
+            Set<Map.Entry<Object, Object>> props = summary.getToBeTranslated().get(fileName).entrySet();
+            resultsText.append("\n" + fileName + "\nMissed translations: " + props.size() + ".\n\t");
+
+            for (Map.Entry<Object, Object> prop : props) {
+                resultsText.append(prop.getKey() + "=" + prop.getValue() + "\n\t");
+            }
+        }
+
+        return resultsText.toString();
     }
 
 }

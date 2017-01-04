@@ -29,6 +29,25 @@ public class DuplicatedPropertyValue {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DuplicatedPropertyValue)) return false;
+
+        DuplicatedPropertyValue that = (DuplicatedPropertyValue) o;
+
+        if (getRowNum() != that.getRowNum()) return false;
+        return getText() != null ? getText().equals(that.getText()) : that.getText() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getRowNum();
+        result = 31 * result + (getText() != null ? getText().hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return  "'" + text + "', row in file: " + rowNum + ";";
     }
