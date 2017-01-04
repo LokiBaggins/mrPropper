@@ -4,7 +4,7 @@
 
   <groupId>by.baggins</groupId>
   <artifactId>mrPropper</artifactId>
-  <version>1.0-ALPHA</version>
+  <version>1.1-BETA</version>
   <packaging>jar</packaging>
 
   <name>mrPropper</name>
