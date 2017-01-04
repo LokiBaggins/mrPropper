@@ -96,14 +96,10 @@ public class ApplicationController {
 
         if (dir != null) {
             directoryPathInput.setText(dir.getPath());
-            analyzeDirectoryFiles(dir.getPath());
+            folderAnalysisResult = folderAnalyzer.analyzeDirectoryFiles(dir.getPath());
+
+            displayFolderAnalysisResult();
         }
-    }
-
-    private void analyzeDirectoryFiles(String dirPath) {
-        folderAnalysisResult = folderAnalyzer.analyzeDirectoryFiles(dirPath);
-
-        displayFolderAnalysisResult();
     }
 
     private void displayFolderAnalysisResult() {

@@ -22,6 +22,8 @@ import by.baggins.dto.DuplicatesSearchResult;
 import by.baggins.dto.FileGroup;
 import by.baggins.dto.FileInfo;
 import by.baggins.dto.FolderAnalysisResult;
+import by.baggins.service.FolderAnalysisService;
+import by.baggins.service.FolderAnalysisServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -31,6 +33,7 @@ import static org.junit.Assert.assertTrue;
 public class ApplicationControllerTest {
     private static String validFilesNamePattern = "validFile";
     private static String duplicatedFilesNamePattern = "duplicates_file";
+    private static String lonePropertiesFilePattern = "lonelyValidFile";
     private static File mockFolder = new File("src\\test\\resources\\mockFolder");
     private static FileMocker fileMocker = new FileMocker(mockFolder.getPath() + "\\");
     private static File validFile1;
@@ -39,10 +42,9 @@ public class ApplicationControllerTest {
     private static File fileWithDuplicatesMixed;
     private static File fileWithDuplicatesKeyOnly;
     private static File fileWithDuplicatesFullOnly;
-
     private static File lonePropertiesFile;
 
-//    private static ObservableList<FileInfo> expectedFileInfoList;
+    private static FolderAnalysisService folderAnalyser = new FolderAnalysisServiceImpl();
     private static FolderAnalysisResult expectedAnalysisResult;
     private static FolderAnalysisResult actualResult;
 
@@ -58,7 +60,7 @@ public class ApplicationControllerTest {
             e.printStackTrace();
         }
 
-        validFile1 = fileMocker.createValidFile1("validFile_xx.properties");
+        validFile1 = fileMocker.createValidFile1("validFile.properties");
         validFile2 = fileMocker.createValidFile2("validFile_yy.properties");
         validFile3 = fileMocker.createValidFile3("validFile_zz.properties");
         fileWithDuplicatesMixed = fileMocker.createFileWithDuplicatesMixed("duplicates_file_xx.properties");
@@ -68,7 +70,7 @@ public class ApplicationControllerTest {
         fileMocker.createNotPropertiesFiles("someTextFile.txt", "someFile.pdf", "someExeFile.exe"); // here you are welcome to set any filenames with extensions different of ".properties". Any of such files must be ignored by application
 
         expectedAnalysisResult = getExpectedAnalysisResult();
-//        actualResult = new ApplicationController().analyzeDirectoryFiles(mockFolder.getPath());
+        actualResult = folderAnalyser.analyzeDirectoryFiles(mockFolder.getPath());
     }
 
     @Test
@@ -84,43 +86,16 @@ public class ApplicationControllerTest {
         }
     }
 
-//    @Test
+    @Test
     public void testAnalyzeDirectoryFiles_groupingFilesByNamePattern() {
         assertEquals(expectedAnalysisResult.getFileGroups().size(), actualResult.getFileGroups().size());
 
         for (FileGroup group : actualResult.getFileGroups()) {
-            String groupFileNamePattern = "^" + group.getName() + "_[a-zA-Z]{2}$";
+            String groupFileNamePattern = "^" + group.getName() + "(_[a-zA-Z]{2})?$";
             for (FileInfo file : group.getFiles()) {
                 assertTrue(file.getFileName().matches(groupFileNamePattern));
             }
         }
-    }
-
-
-    @Test
-    public void java8lambdasTest() {
-        List<Integer> list = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            list.add(i);
-        }
-
-        int  counter = 0;
-        Long start = new Date().getTime();
-        for (Integer li : list) {
-            if (li % 2 == 0) {
-                System.out.print(li);
-                counter++;
-            }
-        }
-        Long stop = new Date().getTime() - start;
-        System.out.println("\nclassic counted " + counter + " evens for " + stop + "ms");
-
-        counter = 0;
-        start = new Date().getTime();
-        long count = list.stream().filter(li -> li % 2 == 0).count();
-        stop = new Date().getTime() - start;
-        System.out.println("\nlambda counted " + count + " evens for " + stop + "ms");
-
     }
 
     @AfterClass
@@ -152,8 +127,12 @@ public class ApplicationControllerTest {
         group2files.addAll(fileWithDuplicatesMixedFileInfo, fileWithDuplicatesKeyOnlyFileInfo, fileWithDuplicatesFullOnlyFileInfo);
         FileGroup group2 = new FileGroup(duplicatedFilesNamePattern, group2files);
 
+        ObservableList<FileInfo> group3files = FXCollections.observableArrayList();
+        group3files.addAll(fileWithDuplicatesMixedFileInfo, fileWithDuplicatesKeyOnlyFileInfo, fileWithDuplicatesFullOnlyFileInfo);
+        FileGroup group3 = new FileGroup(lonePropertiesFilePattern, group3files);
+
         ObservableList<FileGroup> fileGroups = FXCollections.observableArrayList();
-        fileGroups.addAll(group1, group2);
+        fileGroups.addAll(group1, group2, group3);
 
         List<String> ignoredFiles = new ArrayList<>(Arrays.asList("someTextFile.txt", "someFile.pdf", "someExeFile.exe"));
 
