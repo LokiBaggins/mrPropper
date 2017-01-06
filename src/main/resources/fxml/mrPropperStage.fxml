@@ -1,34 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="851.0" prefWidth="1234.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.baggins.controller.ApplicationController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false"
+            prefHeight="851.0" prefWidth="1234.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="by.baggins.controller.ApplicationController">
     <children>
         <TextField fx:id="directoryPathInput" layoutX="216.0" layoutY="37.0" prefHeight="25.0" prefWidth="404.0"/>
-        <Button fx:id="chooseDirectoryBtn" layoutX="629.0" layoutY="37.0" mnemonicParsing="false" onAction="#chooseDirectory" text="Choose folder..." />
-        <Button fx:id="btnCompareFiles" layoutX="738.0" layoutY="37.0" mnemonicParsing="false" onAction="#compareFilesInDirectory" text="Compare" />
-        <Label layoutX="14.0" layoutY="39.0" prefHeight="20.0" prefWidth="246.0" text="Directory, where the files live:">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font></Label>
-        <SplitPane dividerPositions="0.39738430583501005" layoutX="14.0" layoutY="88.0" prefHeight="424.0" prefWidth="1208.0">
+        <Button fx:id="chooseDirectoryBtn" layoutX="629.0" layoutY="37.0" mnemonicParsing="false"
+                onAction="#chooseDirectory" text="Choose folder..."/>
+        <Button fx:id="btnCompareFiles" layoutX="738.0" layoutY="37.0" mnemonicParsing="false"
+                onAction="#compareFilesInDirectory" text="Compare"/>
+        <Label layoutX="14.0" layoutY="39.0" prefHeight="20.0" prefWidth="246.0"
+               text="Directory, where the files live:">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Label>
+        <SplitPane dividerPositions="0.39738430583501005" layoutX="14.0" layoutY="88.0" prefHeight="424.0"
+                   prefWidth="1208.0">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="413.0" prefWidth="476.0">
                     <children>
                         <!--TODO set adjustable width to tableView -->
                         <TableView fx:id="fileInfoTable" layoutX="-1.0" prefHeight="416.0" prefWidth="482.0">
                             <columnResizePolicy>
-                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                             </columnResizePolicy>
                             <columns>
                                 <!--TODO: add file groups coloring and notNull duplicates cells coloring-->
-                                <TableColumn fx:id="fileNameColumn" prefWidth="166.0" text="File Name" />
-                                <TableColumn fx:id="fileTypeColumn" minWidth="0.0" prefWidth="87.0" text="Type" />
-                                <TableColumn fx:id="propertiesNumberColumn" minWidth="0.0" prefWidth="105.0" text="Total keys" />
-                                <TableColumn fx:id="duplicatesNumberColumn" minWidth="0.0" prefWidth="105.0" text="Duplicates" />
+                                <TableColumn fx:id="fileNameColumn" prefWidth="166.0" text="File Name"/>
+                                <TableColumn fx:id="fileTypeColumn" minWidth="0.0" prefWidth="87.0" text="Type"/>
+                                <TableColumn fx:id="propertiesNumberColumn" minWidth="0.0" prefWidth="105.0"
+                                             text="Total keys"/>
+                                <TableColumn fx:id="duplicatesNumberColumn" minWidth="0.0" prefWidth="105.0"
+                                             text="Duplicates"/>
                             </columns>
                         </TableView>
                     </children>
@@ -37,58 +45,68 @@
                     <children>
                         <GridPane layoutX="12.0" layoutY="44.0" prefHeight="102.0" prefWidth="459.0">
                             <children>
-                                <Label text="Keys in file:" GridPane.rowIndex="0" />
-                                <Label text="Duplicates in file:" GridPane.rowIndex="1" />
-                                <Label fx:id="propertiesNumberLabel" prefHeight="17.0" prefWidth="308.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                                <Label fx:id="duplicatesNumberLabel" prefHeight="17.0" prefWidth="307.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                <Label prefHeight="17.0" prefWidth="85.0" text="key duplicates" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-                                <Label prefHeight="17.0" prefWidth="85.0" text="full duplicates" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
-                                <Label fx:id="keyDuplicatesLabel" prefHeight="17.0" prefWidth="307.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                <Label fx:id="fullDuplicatesLabel" prefHeight="17.0" prefWidth="307.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                <Label text="Keys in file:" GridPane.rowIndex="0"/>
+                                <Label text="Duplicates in file:" GridPane.rowIndex="1"/>
+                                <Label fx:id="propertiesNumberLabel" prefHeight="17.0" prefWidth="308.0"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                <Label fx:id="duplicatesNumberLabel" prefHeight="17.0" prefWidth="307.0"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                                <Label prefHeight="17.0" prefWidth="85.0" text="key duplicates"
+                                       GridPane.halignment="RIGHT" GridPane.rowIndex="2"/>
+                                <Label prefHeight="17.0" prefWidth="85.0" text="full duplicates"
+                                       GridPane.halignment="RIGHT" GridPane.rowIndex="3"/>
+                                <Label fx:id="keyDuplicatesLabel" prefHeight="17.0" prefWidth="307.0"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                                <Label fx:id="fullDuplicatesLabel" prefHeight="17.0" prefWidth="307.0"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="3"/>
                             </children>
                             <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="215.0" minWidth="10.0" prefWidth="120.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="312.0" minWidth="10.0" prefWidth="312.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="215.0" minWidth="10.0"
+                                                   prefWidth="120.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="312.0" minWidth="10.0"
+                                                   prefWidth="312.0"/>
                             </columnConstraints>
                             <rowConstraints>
-                                <RowConstraints maxHeight="56.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                                <RowConstraints maxHeight="90.0" minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="30.0" minHeight="16.0" prefHeight="26.0" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="29.0" minHeight="8.0" prefHeight="28.0" vgrow="SOMETIMES" />
+                                <RowConstraints maxHeight="56.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES"/>
+                                <RowConstraints maxHeight="90.0" minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES"/>
+                                <RowConstraints maxHeight="30.0" minHeight="16.0" prefHeight="26.0" vgrow="SOMETIMES"/>
+                                <RowConstraints maxHeight="29.0" minHeight="8.0" prefHeight="28.0" vgrow="SOMETIMES"/>
                             </rowConstraints>
                         </GridPane>
-                        <Label fx:id="fileNameLabel" layoutX="12.0" layoutY="10.0" prefHeight="24.0" prefWidth="363.0" text="File name">
+                        <Label fx:id="fileNameLabel" layoutX="12.0" layoutY="10.0" prefHeight="24.0" prefWidth="363.0"
+                               text="File name">
                             <font>
-                                <Font name="System Bold" size="18.0" />
+                                <Font name="System Bold" size="18.0"/>
                             </font>
                         </Label>
-                  <TextArea fx:id="fileDuplicatesArea" layoutX="7.0" layoutY="196.0" prefHeight="220.0" prefWidth="710.0" />
-                  <Label layoutX="8.0" layoutY="170.0" prefHeight="24.0" prefWidth="182.0" text="Duplicates in file:">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Label>
-                        <!--TODO: add TextArea for duplicates to the right GridPane panel  -->
-
+                        <TextArea fx:id="fileDuplicatesArea" layoutX="7.0" layoutY="196.0" prefHeight="220.0"
+                                  prefWidth="710.0"/>
+                        <Label layoutX="8.0" layoutY="170.0" prefHeight="24.0" prefWidth="182.0"
+                               text="Duplicates in file:">
+                            <font>
+                                <Font name="System Bold" size="14.0"/>
+                            </font>
+                        </Label>
                     </children>
                 </AnchorPane>
             </items>
         </SplitPane>
-            <!--TODO: move resultsArea below the AnchorPane and make it full width-->
-            <TextArea fx:id="resultsArea" layoutX="14.0" layoutY="549.0" prefHeight="287.0" prefWidth="1208.0" wrapText="true">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </TextArea>
-            <Label layoutX="15.0" layoutY="523.0" prefHeight="24.0" prefWidth="182.0" text="Files comparison summary ">
-                <font>
-                    <Font name="System Bold" size="14.0" />
-                </font>
-            </Label>
-      <Label layoutX="197.0" layoutY="523.0" prefHeight="24.0" prefWidth="316.0" text="(need to be translated and added to propper files):">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
+        <TextArea fx:id="resultsArea" layoutX="14.0" layoutY="549.0" prefHeight="287.0" prefWidth="1208.0"
+                  wrapText="true">
+            <font>
+                <Font size="14.0"/>
+            </font>
+        </TextArea>
+        <Label layoutX="15.0" layoutY="523.0" prefHeight="24.0" prefWidth="182.0" text="Files comparison summary ">
+            <font>
+                <Font name="System Bold" size="14.0"/>
+            </font>
+        </Label>
+        <Label layoutX="197.0" layoutY="523.0" prefHeight="24.0" prefWidth="316.0"
+               text="(need to be translated and added to propper files):">
+            <font>
+                <Font size="14.0"/>
+            </font>
+        </Label>
     </children>
 </AnchorPane>

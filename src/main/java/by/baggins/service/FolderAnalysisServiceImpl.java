@@ -22,10 +22,8 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
     @Override
     public FolderAnalysisResult analyzeDirectoryFiles(String dirPath) {
         if (dirPath == null || dirPath.equals("")) {
-//            TODO: throw user-readable exception and handle it
             throw new RuntimeException("Empty directory path");
         }
-
 //        surround with try/catch
         File dir = new File(dirPath);
 //        leaves files only
@@ -33,7 +31,7 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
         File[] dirFiles = dir.listFiles(dirFilesFilter);
 
         if (dirFiles == null) {
-            throw new RuntimeException("Can't scan files from chosen directory");
+            throw new RuntimeException("Can't scan files from directory '" + dir.getAbsolutePath() + "'");
         }
 
 //        sorting files to .properties and ignored ones
@@ -51,8 +49,7 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
         System.out.println("Ignored files: " + ignoredFilesNames);
 
         if (propsFiles.isEmpty()) {
-//            TODO: throw user-readable exception and handle it
-            throw new RuntimeException("No \"..._XX.properties\" files found in dir '" + dir + "'");
+            throw new RuntimeException("No \"....properties\" files found in dir '" + dir + "'");
         }
 
         ObservableList<FileGroup> fileGroups = groupFilesByNamePattern(propsFiles);
@@ -92,7 +89,7 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
         String shortFileName = fileName.substring(0, fileName.lastIndexOf("."));
 
         if (fileName.contains("_")) {
-                shortFileName = fileName.substring(0, fileName.lastIndexOf("_"));
+            shortFileName = fileName.substring(0, fileName.lastIndexOf("_"));
         }
 
         return shortFileName;
@@ -105,8 +102,6 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
         if (propsFile.isFile()) {
             fileName = fileName.substring(0, fileName.lastIndexOf('.'));
             fileType = propsFile.getName().substring(propsFile.getName().indexOf('.') + 1);
-//                TODO: replace with logger
-//            System.out.println("File " + propsFile.getName());
         }
 
         Properties fileProps = getFilePropertiesUTF8(propsFile);
@@ -115,8 +110,6 @@ public class FolderAnalysisServiceImpl implements FolderAnalysisService {
         }
 
         DuplicatesSearchResult duplicates = duplicatesFinder.checkFileForDuplicates(propsFile);
-//                TODO: replace with logger
-//        System.out.println("\tduplicates: " + duplicates);
 
         return new FileInfo(fileName, fileType, fileProps, duplicates);
     }
