@@ -21,6 +21,7 @@ import by.baggins.service.FolderAnalysisServiceImpl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -52,8 +53,13 @@ public class ApplicationController {
     //    Bundle comparison result block
     @FXML private TextArea resultsArea;
 
-    private FolderAnalysisService folderAnalyzer = new FolderAnalysisServiceImpl();
+    private static Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+    static {
+        errorAlert.setTitle("ERROR!");
+    }
+
     private CompareService comparator = new CompareServiceImpl();
+    private FolderAnalysisService folderAnalyzer = new FolderAnalysisServiceImpl();
     private FolderAnalysisResult folderAnalysisResult;
 
     @FXML
@@ -73,15 +79,22 @@ public class ApplicationController {
 
     @FXML
     public void compareFilesInDirectory() {
-        if (folderAnalysisResult == null) {
-            throw new RuntimeException("Select correct directory, please.");
+        try {
+            if (folderAnalysisResult == null) {
+                throw new RuntimeException("Select correct directory, please.");
+            }
+
+            List<ComparisonSummary> groupSummaries = folderAnalysisResult.getFileGroups().stream()
+                    .map(fileGroup -> comparator.compareProperties(fileGroup))
+                    .collect(Collectors.toList());
+
+            resultsArea.appendText(printGroupsComparisonSummaries(groupSummaries));
+
+        } catch (Exception e) {
+            errorAlert.setHeaderText("Error while comparing files in bundle");
+            errorAlert.setContentText(e.getMessage());
+            errorAlert.showAndWait();
         }
-
-        List<ComparisonSummary> groupSummaries = folderAnalysisResult.getFileGroups().stream()
-                .map(fileGroup -> comparator.compareProperties(fileGroup))
-                .collect(Collectors.toList());
-
-        resultsArea.appendText(printGroupsComparisonSummaries(groupSummaries));
     }
 
     @FXML
@@ -96,7 +109,14 @@ public class ApplicationController {
 
         if (dir != null) {
             directoryPathInput.setText(dir.getPath());
-            folderAnalysisResult = folderAnalyzer.analyzeDirectoryFiles(dir.getPath());
+
+            try {
+                folderAnalysisResult = folderAnalyzer.analyzeDirectoryFiles(dir.getPath());
+            } catch (Exception e) {
+                errorAlert.setHeaderText("Error while analysing files in directory '" + dir.getPath() +"'");
+                errorAlert.setContentText(e.getMessage());
+                errorAlert.showAndWait();
+            }
 
             displayFolderAnalysisResult();
         }

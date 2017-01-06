@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import by.baggins.dto.ComparisonSummary;
 import by.baggins.dto.FileGroup;
@@ -25,41 +24,50 @@ public class CompareServiceImpl implements CompareService {
         Long startTime = new Date().getTime();
 
         Map<String, Properties> resultMap = new HashMap<>();
+        String firstFileName = null;
+        String secondFileName = null;
+        try {
 
-        for (String fileName : incomingBundle.keySet()) {
-            Properties props = incomingBundle.get(fileName);
-            if (props == null) {
-                continue;
-            }
+            for (String fileName : incomingBundle.keySet()) {
+                firstFileName = fileName;
+                Properties props = incomingBundle.get(fileName);
+                if (props == null) {
+                    continue;
+                }
 
-            Iterator<Map.Entry<Object, Object>> iterator = props.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<Object, Object> currentProp = iterator.next();
-                String currKey = (String) currentProp.getKey();
-                String currValue = (String) currentProp.getValue();
+                Iterator<Map.Entry<Object, Object>> iterator = props.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<Object, Object> currentProp = iterator.next();
+                    String currKey = (String) currentProp.getKey();
+                    String currValue = (String) currentProp.getValue();
 
-                for (String comparingFileName : incomingBundle.keySet()) {
+                    for (String comparingFileName : incomingBundle.keySet()) {
 
-                    if(fileName.equals(comparingFileName)){
-                        iterator.remove();
-                        continue;
-                    }
+                        secondFileName = comparingFileName;
+                        if(fileName.equals(comparingFileName)){
+                            iterator.remove();
+                            continue;
+                        }
 
-//                    TODO: refactor with
-                    /* Escaping NullPointerException: initialize result Properties for each file while the first call */
-                    Properties toBeTranslated = resultMap.get(comparingFileName);
-                    if (toBeTranslated == null) {
-                        toBeTranslated = new Properties();
-                        resultMap.put(comparingFileName, toBeTranslated);
-                    }
+    //                    TODO: refactor with
+                        /* Escaping NullPointerException: initialize result Properties for each file while the first call */
+                        Properties toBeTranslated = resultMap.get(comparingFileName);
+                        if (toBeTranslated == null) {
+                            toBeTranslated = new Properties();
+                            resultMap.put(comparingFileName, toBeTranslated);
+                        }
 
-                    if (incomingBundle.get(comparingFileName).containsKey(currKey)) {
-                        incomingBundle.get(comparingFileName).remove(currKey);
-                    } else {
-                        toBeTranslated.setProperty(currKey, currValue);
+                        if (incomingBundle.get(comparingFileName).containsKey(currKey)) {
+                            incomingBundle.get(comparingFileName).remove(currKey);
+                        } else {
+                            toBeTranslated.setProperty(currKey, currValue);
+                        }
                     }
                 }
             }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error while comparing files " + firstFileName + " and " + secondFileName + ":\n" + e.getMessage());
         }
 
 //      TODO: remove sout
