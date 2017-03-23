@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 public class App extends Application {
     private ObservableList<FileInfo> fileInfoList = FXCollections.observableArrayList();
 
+//    test commit
     public static void main(String[] args) throws Exception {
         launch(args);
     }
